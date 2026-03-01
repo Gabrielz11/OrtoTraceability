@@ -1,6 +1,24 @@
-# 🏥 OrtoTraceability - Gestão de Rastreabilidade OPME
+# 🏥 OrtoTraceability - Gestão de Rastreabilidade OPME (MVP Tecnológico)
 
-O **OrtoTraceability** é uma solução robusta desenvolvida em **Laravel 12** para gerenciar a rastreabilidade unitária de materiais OPME (Órteses, Próteses e Materiais Especiais) em ambiente hospitalar. O sistema foca em segurança, conformidade e agilidade no fluxo de materiais, desde o estoque até o uso em sala cirúrgica.
+O **OrtoTraceability** é um MVP (Minimum Viable Product) desenvolvido em **Laravel 12**, que demonstra uma arquitetura funcional para rastreabilidade unitária de materiais OPME (Órteses, Próteses e Materiais Especiais) em ambiente hospitalar.
+
+Este projeto foi desenvolvido como prova de conceito técnica e arquitetural, inspirado na experiência profissional do autor com sistemas de rastreabilidade hospitalar, porém não replica, copia ou expõe qualquer propriedade intelectual, regra de negócio proprietária ou dado sensível da empresa onde atuou.
+
+O foco é demonstrar domínio técnico sobre:
+- **Modelagem de rastreabilidade unitária**
+- **Controle de estoque hospitalar**
+- **Auditoria imutável**
+- **Fluxo cirúrgico vinculado a materiais**
+- **Conformidade e segurança da informação**
+
+## 🎯 Objetivo do Projeto
+
+Este MVP demonstra como um sistema hospitalar pode:
+- Garantir rastreabilidade completa por lote e número de série
+- Reduzir riscos de uso de materiais vencidos
+- Registrar trilha de auditoria para compliance
+- Melhorar governança e controle de OPME
+- Estruturar um fluxo seguro entre estoque e sala cirúrgica
 
 ## 🚀 Principais Funcionalidades
 
@@ -13,7 +31,7 @@ O **OrtoTraceability** é uma solução robusta desenvolvida em **Laravel 12** p
 ## 🛠️ Stack Tecnológica
 
 - **Framework:** Laravel 12
-- **Banco de Dados:** SQLite (Desenvolvimento) / MySQL (Produção)
+- **Banco de Dados:** SQLite (Desenvolvimento)
 - **Frontend:** Blade, Tailwind CSS (Design Premium) e Alpine.js (Interatividade)
 - **Segurança:** Laravel Breeze (Auth), CSRF Protection e Trait de Auditoria customizado.
 

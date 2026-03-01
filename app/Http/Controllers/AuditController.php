@@ -9,7 +9,9 @@ class AuditController extends Controller
 {
     public function index(Request $request)
     {
-        $query = AuditLog::with('user')->latest();
+        $query = AuditLog::with(['user', 'entity' => function ($query) {
+            $query->withTrashed();
+        }])->latest();
 
         if ($request->action) {
             $query->where('action', $request->action);

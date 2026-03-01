@@ -11,6 +11,7 @@ class MaterialItem extends Model
     use SoftDeletes, Auditable;
 
     protected $fillable = [
+        'nome',
         'lote',
         'numero_serie',
         'validade',

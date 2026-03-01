@@ -47,6 +47,17 @@
                 <p class="text-[10px] font-bold text-text-secondary uppercase tracking-widest mb-1">{{ $surgery->data_hora->diffForHumans() }}</p>
                 <h3 class="text-xl font-bold text-text-primary line-clamp-1">{{ $surgery->paciente }}</h3>
                 <p class="text-xs text-text-secondary mt-1">{{ $surgery->hospital }} • Dr(a). {{ $surgery->medico }}</p>
+                
+                @if($surgery->materials->count() > 0)
+                <div class="mt-3 flex flex-wrap gap-1">
+                    @foreach($surgery->materials->take(2) as $mat)
+                        <span class="text-[9px] bg-surface border border-border px-1.5 py-0.5 rounded font-medium text-text-secondary">{{ $mat->nome }}</span>
+                    @endforeach
+                    @if($surgery->materials->count() > 2)
+                        <span class="text-[9px] text-text-secondary font-bold">+{{ $surgery->materials->count() - 2 }} outros</span>
+                    @endif
+                </div>
+                @endif
             </div>
 
             <div class="mt-auto border-t border-border pt-4 flex items-center justify-between">

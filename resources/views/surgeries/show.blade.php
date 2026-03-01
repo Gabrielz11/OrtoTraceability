@@ -50,7 +50,7 @@
             <table class="w-full text-left text-sm">
                 <thead>
                     <tr class="text-text-secondary bg-surface-light border-b border-border">
-                        <th class="px-6 py-3 font-semibold">Lote / Série</th>
+                        <th class="px-6 py-3 font-semibold">Material</th>
                         <th class="px-6 py-3 font-semibold text-center">Ação</th>
                         <th class="px-6 py-3 font-semibold text-right">Gerenciar</th>
                     </tr>
@@ -59,8 +59,8 @@
                     @forelse($surgery->materials as $material)
                     <tr class="hover:bg-surface-light transition">
                         <td class="px-6 py-4">
-                            <p class="font-bold text-text-primary underline hover:text-primary"><a href="{{ route('materials.show', $material) }}">{{ $material->lote }}</a></p>
-                            <p class="text-[10px] text-text-secondary">{{ $material->numero_serie }}</p>
+                            <p class="font-bold text-text-primary">{{ $material->nome ?? 'Sem nome' }}</p>
+                            <p class="text-[10px] text-text-secondary"><a href="{{ route('materials.show', $material) }}" class="hover:underline">Lote: {{ $material->lote }}</a> • SN: {{ $material->numero_serie ?? 'N/A' }}</p>
                         </td>
                         <td class="px-6 py-4 text-center">
                             <span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold border {{ $material->pivot->acao == 'usado' ? 'bg-green-100 text-success border-success/20' : 'bg-blue-100 text-primary border-primary/20' }}">
@@ -106,7 +106,7 @@
                         <option value="">Selecione...</option>
                         @foreach($available_materials as $item)
                         <option value="{{ $item->id }}" {{ $item->isExpired() ? 'disabled' : '' }}>
-                            {{ $item->lote }} (Exp: {{ $item->validade->format('d/m/y') }})
+                            {{ $item->nome }} - {{ $item->lote }} (Val: {{ $item->validade->format('d/m/y') }})
                         </option>
                         @endforeach
                     </select>

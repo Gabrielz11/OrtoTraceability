@@ -4,8 +4,8 @@
 <div class="flex flex-col gap-8" x-data="{ tab: 'info' }">
     <div class="flex items-center justify-between">
         <div class="flex items-baseline gap-4">
-            <h1 class="text-3xl font-bold text-text-primary">Material #{{ $material->id }}</h1>
-            <span class="text-2xl font-semibold text-text-secondary">{{ $material->lote }}</span>
+            <h1 class="text-3xl font-bold text-text-primary">{{ $material->nome ?? 'Material' }}</h1>
+            <span class="text-2xl font-semibold text-text-secondary">#{{ $material->lote }}</span>
         </div>
         <div class="flex gap-4">
             <a href="{{ route('materials.edit', $material) }}" class="px-5 py-2.5 bg-white border border-border text-text-primary rounded-2xl font-semibold shadow-sm hover:bg-surface transition">
@@ -31,6 +31,10 @@
         <div class="lg:col-span-2 bg-white rounded-2xl border border-border p-8 shadow-sm">
             <h3 class="text-lg font-bold text-text-primary mb-6">Ficha Técnica</h3>
             <div class="grid grid-cols-2 gap-y-8">
+                <div class="col-span-2">
+                    <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-1">Nome do Material</label>
+                    <p class="text-xl font-bold text-text-primary">{{ $material->nome ?? 'Não informado' }}</p>
+                </div>
                 <div>
                     <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-1">Fabricante</label>
                     <p class="text-text-primary font-medium">{{ $material->fabricante }}</p>

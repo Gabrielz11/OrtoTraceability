@@ -22,11 +22,11 @@ class SystemSeeder extends Seeder
 
         // Materials
         $materials = [
-            ['lote' => 'L001-24', 'validade' => now()->addMonths(6), 'fabricante' => 'Medtronic', 'status' => 'em_estoque'],
-            ['lote' => 'L002-24', 'validade' => now()->addDays(5), 'fabricante' => 'Johnson & Johnson', 'status' => 'em_estoque'],
-            ['lote' => 'LXXX-OLD', 'validade' => now()->subMonths(1), 'fabricante' => 'Zimmer Biomet', 'status' => 'em_estoque'],
-            ['lote' => 'B99-C1', 'validade' => now()->addMonths(12), 'fabricante' => 'Stryker', 'status' => 'em_estoque'],
-            ['lote' => 'R-RESERVE-1', 'validade' => now()->addMonths(3), 'fabricante' => 'Medtronic', 'status' => 'reservado'],
+            ['nome' => 'Placa de Titânio 3.5mm', 'lote' => 'L001-24', 'validade' => now()->addMonths(6), 'fabricante' => 'Medtronic', 'status' => 'em_estoque'],
+            ['nome' => 'Parafuso Cortical 2.0mm', 'lote' => 'L002-24', 'validade' => now()->addDays(5), 'fabricante' => 'Johnson & Johnson', 'status' => 'em_estoque'],
+            ['nome' => 'Haste Intramedular', 'lote' => 'LXXX-OLD', 'validade' => now()->subMonths(1), 'fabricante' => 'Zimmer Biomet', 'status' => 'em_estoque'],
+            ['nome' => 'Grampo Cirúrgico', 'lote' => 'B99-C1', 'validade' => now()->addMonths(12), 'fabricante' => 'Stryker', 'status' => 'em_estoque'],
+            ['nome' => 'Fio de Sutura Aço', 'lote' => 'R-RESERVE-1', 'validade' => now()->addMonths(3), 'fabricante' => 'Medtronic', 'status' => 'reservado'],
         ];
 
         foreach ($materials as $m) {

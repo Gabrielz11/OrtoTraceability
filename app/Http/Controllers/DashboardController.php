@@ -23,7 +23,9 @@ class DashboardController extends Controller
             ->count(),
         ];
 
-        $recent_audits = AuditLog::with('user')->latest()->take(10)->get();
+        $recent_audits = AuditLog::with(['user', 'entity' => function ($query) {
+            $query->withTrashed();
+        }])->latest()->take(10)->get();
 
         $near_expiry_items = MaterialItem::where('status', '!=', 'implantado_usado')
             ->get()

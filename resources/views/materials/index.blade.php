@@ -16,6 +16,10 @@
     <div class="bg-surface rounded-2xl border border-border p-6 shadow-sm">
         <form action="{{ route('materials.index') }}" method="GET" class="flex flex-wrap gap-4 items-end">
             <div class="flex-1 min-w-[200px]">
+                <label class="block text-sm font-semibold text-text-secondary mb-2">Filtrar por Nome</label>
+                <input type="text" name="nome" value="{{ request('nome') }}" placeholder="Ex: Placa..." class="w-full bg-white border border-border rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none">
+            </div>
+            <div class="flex-1 min-w-[200px]">
                 <label class="block text-sm font-semibold text-text-secondary mb-2">Filtrar por Lote</label>
                 <input type="text" name="lote" value="{{ request('lote') }}" placeholder="Ex: L123..." class="w-full bg-white border border-border rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none">
             </div>
@@ -44,6 +48,7 @@
         <table class="w-full text-left text-sm">
             <thead class="bg-surface border-b border-border text-text-secondary">
                 <tr>
+                    <th class="px-6 py-4 font-semibold">Material</th>
                     <th class="px-6 py-4 font-semibold">Lote / Série</th>
                     <th class="px-6 py-4 font-semibold">Validade</th>
                     <th class="px-6 py-4 font-semibold">Fabricante</th>
@@ -55,7 +60,10 @@
                 @forelse($materials as $material)
                 <tr class="hover:bg-surface-light transition {{ $material->isExpired() ? 'bg-red-50/20' : '' }}">
                     <td class="px-6 py-4">
-                        <p class="font-bold text-text-primary">{{ $material->lote }}</p>
+                        <p class="font-bold text-text-primary">{{ $material->nome ?? 'Sem nome' }}</p>
+                    </td>
+                    <td class="px-6 py-4">
+                        <p class="font-medium text-text-secondary">{{ $material->lote }}</p>
                         <p class="text-xs text-text-secondary">{{ $material->numero_serie ?? 'Sem nº de série' }}</p>
                     </td>
                     <td class="px-6 py-4">

@@ -33,8 +33,22 @@
                             {{ strtoupper($log->action) }}
                         </span>
                     </td>
-                    <td class="px-6 py-4 text-text-primary font-medium">
-                        {{ class_basename($log->entity_type) }} #{{ $log->entity_id }}
+                    <td class="px-6 py-4">
+                        <p class="text-text-primary font-bold">
+                            @if($log->entity_type === 'App\Models\MaterialItem')
+                                {{ $log->entity?->nome ?? 'Material Removido' }}
+                            @elseif($log->entity_type === 'App\Models\Surgery')
+                                {{ $log->entity?->paciente ?? 'Cirurgia Removida' }}
+                            @else
+                                {{ class_basename($log->entity_type) }} #{{ $log->entity_id }}
+                            @endif
+                        </p>
+                        <p class="text-[10px] text-text-secondary">
+                            {{ class_basename($log->entity_type) }} • ID: {{ $log->entity_id }}
+                            @if($log->entity_type === 'App\Models\MaterialItem' && $log->entity?->lote)
+                                • Lote: {{ $log->entity->lote }}
+                            @endif
+                        </p>
                     </td>
                     <td class="px-6 py-4">
                         <div class="max-w-xs overflow-hidden text-ellipsis whitespace-nowrap text-xs text-text-secondary font-mono" title="{{ json_encode($log->after ?? $log->metadata) }}">

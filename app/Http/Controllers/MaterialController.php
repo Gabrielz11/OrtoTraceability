@@ -12,6 +12,9 @@ class MaterialController extends Controller
     {
         $query = MaterialItem::query();
 
+        if ($request->nome) {
+            $query->where('nome', 'like', "%{$request->nome}%");
+        }
         if ($request->status) {
             $query->where('status', $request->status);
         }
@@ -31,6 +34,7 @@ class MaterialController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'nome' => 'required|string|max:255',
             'lote' => 'required|string',
             'numero_serie' => 'nullable|string|unique:material_items,numero_serie',
             'validade' => 'required|date',
@@ -63,6 +67,7 @@ class MaterialController extends Controller
     public function update(Request $request, MaterialItem $material)
     {
         $validated = $request->validate([
+            'nome' => 'required|string|max:255',
             'lote' => 'required|string',
             'numero_serie' => 'nullable|string|unique:material_items,numero_serie,' . $material->id,
             'validade' => 'required|date',

@@ -62,20 +62,22 @@
             <table class="w-full text-left text-sm">
                 <thead class="bg-surface-light border-b border-border text-text-secondary">
                     <tr>
+                        <th class="px-6 py-3 font-semibold text-[10px] uppercase">Material</th>
                         <th class="px-6 py-3 font-semibold text-[10px] uppercase">Lote</th>
                         <th class="px-6 py-3 font-semibold text-[10px] uppercase">Validade</th>
-                        <th class="px-6 py-3 font-semibold text-[10px] uppercase">Fabricante</th>
                         <th class="px-6 py-3 font-semibold text-[10px] uppercase">Status</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-border">
                     @forelse($near_expiry_items as $item)
                     <tr class="hover:bg-surface-light transition">
-                        <td class="px-6 py-4 font-bold text-text-primary underline"><a href="{{ route('materials.show', $item) }}">{{ $item->lote }}</a></td>
+                        <td class="px-6 py-4 font-bold text-text-primary">
+                            <a href="{{ route('materials.show', $item) }}" class="hover:underline">{{ $item->nome ?? 'Sem nome' }}</a>
+                        </td>
+                        <td class="px-6 py-4 text-text-secondary">{{ $item->lote }}</td>
                         <td class="px-6 py-4 {{ $item->isExpired() ? 'text-danger font-bold' : 'text-text-secondary' }}">
                             {{ $item->validade->format('d/m/Y') }}
                         </td>
-                        <td class="px-6 py-4 text-text-secondary">{{ $item->fabricante }}</td>
                         <td class="px-6 py-4 text-center">
                             @if($item->isExpired())
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-danger border border-red-200 uppercase">Vencido</span>
@@ -108,7 +110,16 @@
                         <span class="text-[10px] font-bold">{{ strtoupper(substr($audit->action, 0, 1)) }}</span>
                     </div>
                     <div class="flex flex-col gap-0.5">
-                        <p class="text-xs font-bold text-text-primary">{{ ucfirst($audit->action) }} {{ class_basename($audit->entity_type) }}</p>
+                        <p class="text-xs font-bold text-text-primary">
+                            {{ ucfirst($audit->action) }} 
+                            @if($audit->entity_type === 'App\Models\MaterialItem')
+                                {{ $audit->entity?->nome ?? 'Material' }}
+                            @elseif($audit->entity_type === 'App\Models\Surgery')
+                                {{ $audit->entity?->paciente ?? 'Cirurgia' }}
+                            @else
+                                {{ class_basename($audit->entity_type) }}
+                            @endif
+                        </p>
                         <p class="text-[10px] text-text-secondary">{{ $audit->created_at->diffForHumans() }} • {{ $audit->user->name ?? 'Sistema' }}</p>
                     </div>
                 </div>

@@ -11,6 +11,13 @@
 
     <form action="{{ route('materials.store') }}" method="POST" class="bg-white rounded-2xl border border-border p-10 shadow-sm flex flex-col gap-8">
         @csrf
+        
+        <div class="flex flex-col gap-2">
+            <label class="text-sm font-bold text-text-secondary">Nome do Material (Obrigatório)</label>
+            <input type="text" name="nome" value="{{ old('nome') }}" required placeholder="Ex: Placa de Titânio 3.5mm" class="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none">
+            @error('nome') <p class="text-xs text-danger font-bold mt-1">{{ $message }}</p> @enderror
+        </div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="flex flex-col gap-2">
                 <label class="text-sm font-bold text-text-secondary">Lote (Obrigatório)</label>

@@ -54,6 +54,7 @@ Este MVP demonstra como um sistema hospitalar pode:
    cp .env.example .env
    php artisan key:generate
    ```
+   *Nota: O comando `php artisan key:generate` é essencial para gerar a chave de criptografia da aplicação (`APP_KEY`), garantindo que todas as sessões e dados criptografados estejam protegidos.*
 
 4. **Banco de Dados:**
    ```bash

@@ -1,172 +1,142 @@
-# 🏥 OrtoTraceability
+# OrtoTraceability
 
-[![Laravel](https://img.shields.io/badge/Laravel-12.x-FF2D20?logo=laravel&logoColor=white)](https://laravel.com)
-[![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?logo=php&logoColor=white)](https://php.net)
-[![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)](https://mysql.com)
-[![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?logo=docker&logoColor=white)](https://docker.com)
+[![Laravel 12](https://img.shields.io/badge/Laravel-12.x-FF2D20?logo=laravel&logoColor=white)](https://laravel.com)
+[![PHP 8.2+](https://img.shields.io/badge/PHP-8.2+-777BB4?logo=php&logoColor=white)](https://php.net)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**OrtoTraceability** is a professional management system designed to solve the critical challenges of **OPME** (Orthotics, Prosthetics, and Special Materials) traceability in hospital environments. Built with **Laravel 12**, it ensures that every implant used in surgery is tracked, validated, and audited with absolute precision.
+OrtoTraceability is a management system designed for OPME (Orthotics, Prosthetics, and Special Materials) unit-level traceability. Built on Laravel 12, it provides a functional architecture for tracking medical implants across the surgical workflow.
 
 > [!NOTE]
 > **Professional Disclaimer:** This project is a technical and architectural proof-of-concept (PoC) inspired by the author's professional experience in the healthcare sector. It is an original work and DOES NOT replicate, copy, or expose any proprietary code, intellectual property, trade secrets, or sensitive business data from any current or former employer. The system serves solely as a demonstration of technical expertise in medical inventory compliance and secure workflow architecture.
 
 ---
 
-## 🌟 Why This Project Matters
+## Why This Project Matters
 
-Healthcare systems depend heavily on traceability of surgical materials (OPME). The lack of rigorous control can lead to:
+Healthcare systems depend on the traceability of surgical materials (OPME). Poor control often leads to:
 
-- **Financial Losses:** Insurance claim denials due to missing material usage records.
-- **Compliance Risks:** Legal and regulatory issues for hospitals failing to prove material origin.
-- **Patient Safety Issues:** Risks associated with using expired or unvalidated implants.
-- **Audit Deficiencies:** Difficulty in performing forensic audits on past surgical procedures.
+*   **Financial Losses:** Denials of insurance claims due to incomplete usage records.
+*   **Compliance Risks:** Legal issues arising from an inability to prove material origins.
+*   **Patient Safety:** Risks associated with using expired or unvalidated implants.
+*   **Audit Gaps:** Challenges in forensic auditing of past surgical procedures.
 
-**OrtoTraceability** provides a transparent and auditable system for tracking surgical materials across the entire supply chain, ensuring safety and fiscal responsibility.
-
----
-
-## 🔍 Use Case
-
-1. **Reception:** Distributor sends surgical materials to the hospital.
-2. **Allocation:** Materials are registered and linked to a scheduled surgical procedure.
-3. **Surgery:** The system records real-time usage (implanted/discarded) during the surgery.
-4. **Validation:** An automated audit log guarantees traceability (Who, When, What).
-5. **Billing:** Data is exported for seamless hospital billing and compliance verification.
+OrtoTraceability offers an auditable system for tracking materials across the supply chain, ensuring safety and fiscal accountability.
 
 ---
 
-## 🚀 Key Features
+## Use Case
 
-- **Unit-Level Traceability:** Precise control of batch numbers, unique serial numbers, and expiration dates.
-- **Intelligent Surgical Linking:** Smart association between surgical schedules and material batches.
-- **Immutable Audit Trail:** Automatic logging of every critical action (Create, Update, Delete, Link, Status Change).
-- **Inventory Intelligence:** Dashboard with real-time expiration alerts (30-day window) and automatic blocking of expired items.
-- **Secure Access Control:** Integrated authentication for authorized hospital professionals.
-
----
-
-## 🛠️ Tech Stack
-
-- **Framework:** Laravel 12 (latest)
-- **Database:** MySQL 8.0 (Containerized)
-- **Frontend:** Blade Templates, Tailwind CSS (Modern UI), and Alpine.js (Lightweight Interactivity).
-- **Environment:** Docker & Docker Compose.
-- **Security:** CSRF Protection, Password Hashing, and Custom Audit Traits.
+1. **Reception:** Distributor deliveries are registered in the hospital inventory.
+2. **Allocation:** Materials are linked to specific scheduled surgical procedures.
+3. **Usage:** The system records real-time usage (implanted or discarded) during surgery.
+4. **Validation:** An automated audit log guarantees traceability (Actor, Timestamp, Action).
+5. **Billing:** Data export capabilities support hospital billing and compliance verification.
 
 ---
 
-## 🏗️ System Architecture
+## Core Features
+
+*   **Unit-Level Tracking:** Precise management of batch numbers, serial numbers, and expiration dates.
+*   **Surgical Linking:** Dynamic association between surgical schedules and material stock.
+*   **Immutable Audit Logs:** Automatic tracking of all CRUD and status-change operations.
+*   **Inventory Intelligence:** Real-time dashboards with expiration alerts and automated blocking of expired items.
+*   **Secure Authentication:** Integrated access control for authorized personnel.
+
+---
+
+## Tech Stack
+
+*   **Backend:** Laravel 12, MySQL 8.0
+*   **Frontend:** Blade Templates, Tailwind CSS, Alpine.js
+*   **Infrastructure:** Docker & Docker Compose
+*   **Audit Logic:** Custom traits for automated action logging
+
+---
+
+## System Architecture
 
 ```mermaid
 graph TD
-    User([Hospital Staff]) -->|Web Interace| App[Laravel 12 App]
-    subgraph infrastructure [Infrastructure]
+    User([Hospital Staff]) -->|Web Interface| App[Laravel 12 App]
+    subgraph Infrastructure
         App -->|Query/Persist| DB[(MySQL 8.0)]
-        App -->|Track Actions| Audit[Audit Log Trait]
+        App -->|Log Actions| Audit[Audit Trait]
     end
-    DB -->|Persistent Storage| Volume[(Docker Volumes)]
+    DB -->|Persistence| Volume[(Docker Volume)]
 ```
 
 ---
 
-## 📦 Installation Instructions
+## Installation and Setup
 
 ### Prerequisites
-- [Docker](https://www.docker.com/get-started)
-- [PHP 8.2+](https://www.php.net/downloads.php) (optional for local dev)
-- [Composer](https://getcomposer.org/)
+*   [Docker](https://www.docker.com/)
+*   [Composer](https://getcomposer.org/)
 
-### Step-by-Step Setup
+### Setup Steps
 
-1. **Clone the Repository:**
-   ```bash
-   git clone https://github.com/Gabrielz11/OrtoTraceability.git
-   cd OrtoTraceability
-   ```
+1.  **Clone the Repository:**
+    ```bash
+    git clone https://github.com/Gabrielz11/OrtoTraceability.git
+    cd OrtoTraceability
+    ```
 
-2. **Install Dependencies:**
-   ```bash
-   composer install
-   npm install
-   ```
+2.  **Install Dependencies:**
+    ```bash
+    composer install
+    npm install
+    ```
 
-3. **Environment Configuration:**
-   ```bash
-   cp .env.example .env
-   php artisan key:generate
-   ```
+3.  **Configure Environment:**
+    ```bash
+    cp .env.example .env
+    php artisan key:generate
+    ```
 
-4. **Initialize Database (Docker):**
-   ```bash
-   # Start the MySQL container
-   docker-compose up -d
+4.  **Initialize Database (via Docker):**
+    ```bash
+    # Start the containerized services
+    docker-compose up -d
 
-   # Run migrations and seed demo data
-   php artisan migrate --seed
-   ```
-
----
-
-## 🏃 How to Run the Project
-
-1. **Access the Application:**
-   Once Docker is running and migrations are finished, start the local server:
-   ```bash
-   php artisan serve
-   ```
-   The application will be available at `http://127.0.0.1:8000`.
-
-2. **Demo Access:**
-   Login with the pre-configured credentials:
-   - **Email:** `admin@hospital.com`
-   - **Password:** `password`
+    # Run migrations and seed dummy data
+    php artisan migrate --seed
+    ```
 
 ---
 
-## 📸 Screenshots
+## Running the Application
 
-> [!NOTE]
-> *Screenshots showcase the Premium Dashboard UI and the Surgical Material Linking interface.*
+1.  **Start the Server:**
+    ```bash
+    php artisan serve
+    ```
+    Access the system at `http://127.0.0.1:8000`.
 
-| Dashboard | Materials | Audit |
-| :---: | :---: | :---: |
+2.  **Default Credentials:**
+    *   **Email:** `admin@hospital.com`
+    *   **Password:** `password`
+
+---
+
+## Screenshots
+
+| Dashboard Overview | Material Management | Audit Logs |
+| :--- | :--- | :--- |
 | ![Dashboard Overview](public/assets/dashboard.png) | ![Material Tracking](public/assets/materials.png) | ![Audit Logs](public/assets/audit.png) |
 
 ---
 
-## 🗺️ Roadmap & Future Improvements
+## Roadmap
 
-- [ ] **RFID Integration:** Real-time tracking via hardware scanners.
-- [ ] **Mobile App:** Native React Native/Flutter app for barcode scanning in operating rooms.
-- [ ] **Multi-Hospital Support:** SaaS architecture for managing multiple healthcare facilities.
-- [ ] **Advanced Reports:** AI-driven prediction of stock needs based on surgical volume.
-
----
-
-## 🤝 Contributing Guidelines
-
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+*   [ ] **RFID/Barcode Integration:** Direct hardware scanning support.
+*   [ ] **Mobile Client:** Dedicated app for operating room scanning.
+*   [ ] **Multi-Hospital Support:** Multi-tenant architecture.
+*   [ ] **Advanced Analytics:** AI-driven stock forecasting.
 
 ---
 
-## 👨‍💻 Author Information
+## Author and License
 
-**Gabrielz11**
-- GitHub: [@Gabrielz11](https://github.com/Gabrielz11)
-- Project: OrtoTraceability
+**Gabrielz11** - [GitHub](https://github.com/Gabrielz11)
 
----
-
-## 📄 License
-
-Distributed under the **MIT License**. See `LICENSE` for more information.
-
----
-*Developed with focus on **Healthcare Quality & Traceability Excellence**.*
+Distributed under the **MIT License**.

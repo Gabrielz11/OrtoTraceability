@@ -8,6 +8,9 @@
 
 **OrtoTraceability** is a professional management system designed to solve the critical challenges of **OPME** (Orthotics, Prosthetics, and Special Materials) traceability in hospital environments. Built with **Laravel 12**, it ensures that every implant used in surgery is tracked, validated, and audited with absolute precision.
 
+> [!NOTE]
+> **Professional Disclaimer:** This project is a technical and architectural proof-of-concept (PoC) inspired by the author's professional experience in the healthcare sector. It is an original work and DOES NOT replicate, copy, or expose any proprietary code, intellectual property, trade secrets, or sensitive business data from any current or former employer. The system serves solely as a demonstration of technical expertise in medical inventory compliance and secure workflow architecture.
+
 ---
 
 ## 🌟 Why This Project Matters

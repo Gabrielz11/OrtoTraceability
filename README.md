@@ -128,7 +128,7 @@ graph TD
 
 | Dashboard | Materials | Audit |
 | :---: | :---: | :---: |
-| ![Dashboard Overview](public\assets\dashboard.png) | ![Material Tracking](public\assets\materials.png) | ![Audit Logs](public\assets\audit.png) |
+| ![Dashboard Overview](public/assets/dashboard.png) | ![Material Tracking](public/assets/materials.png) | ![Audit Logs](public/assets/audit.png) |
 
 ---
 

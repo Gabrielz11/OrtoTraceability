@@ -18,11 +18,24 @@
 /public/storage
 /storage/*.key
 /storage/pail
+/storage/debugbar
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*
+/storage/logs/*.log
+/storage/app/*
+!/storage/app/.gitignore
 /vendor
 /database/*.sqlite
+/database/*.sqlite-journal
 Homestead.json
 Homestead.yaml
 Thumbs.db
+.phpunit.result.cache
+.env.local
+.env.testing
+
 
 # Documentation
 *.md

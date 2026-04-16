@@ -2,15 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\MaterialItem;
-use App\Models\AuditLog;
+use App\Modules\Audit\Models\AuditEvent;
+use App\Modules\Material\Application\Services\MaterialCrudService;
+use App\Modules\Material\Domain\Models\Material;
 use Illuminate\Http\Request;
 
 class MaterialController extends Controller
 {
+    public function __construct(
+        private readonly MaterialCrudService $service,
+    ) {}
+
     public function index(Request $request)
     {
-        $query = MaterialItem::query();
+        $query = Material::query();
 
         if ($request->nome) {
             $query->where('nome', 'like', "%{$request->nome}%");
@@ -43,15 +48,15 @@ class MaterialController extends Controller
             'observacoes' => 'nullable|string',
         ]);
 
-        $material = MaterialItem::create($validated);
+        $material = $this->service->store($validated);
 
         return redirect()->route('materials.show', $material)
             ->with('success', 'Material cadastrado com sucesso.');
     }
 
-    public function show(MaterialItem $material)
+    public function show(Material $material)
     {
-        $audits = AuditLog::where('entity_type', MaterialItem::class)
+        $audits = AuditEvent::where('entity_type', 'material')
             ->where('entity_id', $material->id)
             ->latest()
             ->get();
@@ -59,12 +64,12 @@ class MaterialController extends Controller
         return view('materials.show', compact('material', 'audits'));
     }
 
-    public function edit(MaterialItem $material)
+    public function edit(Material $material)
     {
         return view('materials.edit', compact('material'));
     }
 
-    public function update(Request $request, MaterialItem $material)
+    public function update(Request $request, Material $material)
     {
         $validated = $request->validate([
             'nome' => 'required|string|max:255',
@@ -76,15 +81,16 @@ class MaterialController extends Controller
             'observacoes' => 'nullable|string',
         ]);
 
-        $material->update($validated);
+        $this->service->update($material, $validated);
 
         return redirect()->route('materials.show', $material)
             ->with('success', 'Material atualizado com sucesso.');
     }
 
-    public function destroy(MaterialItem $material)
+    public function destroy(Material $material)
     {
-        $material->delete();
+        $this->service->delete($material);
+
         return redirect()->route('materials.index')
             ->with('success', 'Material removido com sucesso.');
     }

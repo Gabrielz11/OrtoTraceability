@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Modules\Material\Domain\Models\Material;
+use App\Modules\Surgery\Domain\Models\Surgery;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +22,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Relation::morphMap([
+            'material' => Material::class,
+            'surgery'  => Surgery::class,
+        ]);
     }
 }

@@ -2,14 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Surgery;
-use App\Models\MaterialItem;
-use App\Models\AuditLog;
+use App\Modules\Audit\Models\AuditEvent;
+use App\Modules\Material\Domain\Models\Material;
+use App\Modules\Surgery\Application\Services\SurgeryMaterialService;
+use App\Modules\Surgery\Application\Services\SurgeryService;
+use App\Modules\Surgery\Domain\Models\Surgery;
+use DomainException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class SurgeryController extends Controller
 {
+    public function __construct(
+        private readonly SurgeryService $surgeryService,
+        private readonly SurgeryMaterialService $materialService,
+    ) {}
+
     public function index(Request $request)
     {
         $query = Surgery::query();
@@ -38,7 +45,7 @@ class SurgeryController extends Controller
             'observacoes' => 'nullable|string',
         ]);
 
-        $surgery = Surgery::create($validated);
+        $surgery = $this->surgeryService->store($validated);
 
         return redirect()->route('surgeries.show', $surgery)
             ->with('success', 'Cirurgia cadastrada com sucesso.');
@@ -46,12 +53,12 @@ class SurgeryController extends Controller
 
     public function show(Surgery $surgery)
     {
-        $audits = AuditLog::where('entity_type', Surgery::class)
+        $audits = AuditEvent::where('entity_type', 'surgery')
             ->where('entity_id', $surgery->id)
             ->latest()
             ->get();
 
-        $available_materials = MaterialItem::where('status', 'em_estoque')->get();
+        $available_materials = Material::where('status', 'em_estoque')->get();
 
         return view('surgeries.show', compact('surgery', 'audits', 'available_materials'));
     }
@@ -72,7 +79,7 @@ class SurgeryController extends Controller
             'observacoes' => 'nullable|string',
         ]);
 
-        $surgery->update($validated);
+        $this->surgeryService->update($surgery, $validated);
 
         return redirect()->route('surgeries.show', $surgery)
             ->with('success', 'Cirurgia atualizada com sucesso.');
@@ -81,63 +88,40 @@ class SurgeryController extends Controller
     public function linkMaterial(Request $request, Surgery $surgery)
     {
         $request->validate(['material_id' => 'required|exists:material_items,id']);
-        $material = MaterialItem::find($request->material_id);
+        $material = Material::findOrFail($request->material_id);
 
-        if ($material->status !== 'em_estoque') {
-            return back()->with('error', 'Material não disponível para reserva.');
+        try {
+            $this->materialService->linkMaterial($surgery, $material);
+            return back()->with('success', 'Material vinculado com sucesso.');
+        } catch (DomainException $e) {
+            return back()->with('error', $e->getMessage());
         }
-
-        if ($material->isExpired()) {
-            return back()->with('error', 'Não é possível vincular material vencido.');
-        }
-
-        DB::transaction(function () use ($surgery, $material) {
-            $surgery->materials()->attach($material->id, ['acao' => 'reservado']);
-            $material->update(['status' => 'reservado']);
-
-            $surgery->logAudit('link', null, ['material_id' => $material->id], ['context' => 'linked material']);
-        });
-
-        return back()->with('success', 'Material vinculado com sucesso.');
     }
 
-    public function unlinkMaterial(Surgery $surgery, MaterialItem $material)
+    public function unlinkMaterial(Surgery $surgery, Material $material)
     {
-        $pivot = $surgery->materials()->where('material_item_id', $material->id)->first()->pivot;
-
-        if ($pivot->acao === 'usado') {
-            return back()->with('error', 'Não é possível desvincular um material que já foi usado.');
+        try {
+            $this->materialService->unlinkMaterial($surgery, $material);
+            return back()->with('success', 'Material desvinculado.');
+        } catch (DomainException $e) {
+            return back()->with('error', $e->getMessage());
         }
-
-        DB::transaction(function () use ($surgery, $material) {
-            $surgery->materials()->detach($material->id);
-            $material->update(['status' => 'em_estoque']);
-
-            $surgery->logAudit('unlink', ['material_id' => $material->id], null, ['context' => 'unlinked material']);
-        });
-
-        return back()->with('success', 'Material desvinculado.');
     }
 
-    public function markAsUsed(Surgery $surgery, MaterialItem $material)
+    public function markAsUsed(Surgery $surgery, Material $material)
     {
-        if ($surgery->status === 'cancelada') {
-            return back()->with('error', 'Cirurgia cancelada. Não é possível usar materiais.');
+        try {
+            $this->materialService->markAsUsed($surgery, $material);
+            return back()->with('success', 'Material marcado como usado.');
+        } catch (DomainException $e) {
+            return back()->with('error', $e->getMessage());
         }
-
-        DB::transaction(function () use ($surgery, $material) {
-            $surgery->materials()->updateExistingPivot($material->id, ['acao' => 'usado']);
-            $material->update(['status' => 'implantado_usado']);
-
-            $surgery->logAudit('status_change', ['material_id' => $material->id, 'old_acao' => 'reservado'], ['new_acao' => 'usado']);
-        });
-
-        return back()->with('success', 'Material marcado como usado.');
     }
 
     public function destroy(Surgery $surgery)
     {
-        $surgery->delete();
+        $this->surgeryService->delete($surgery);
+
         return redirect()->route('surgeries.index')
             ->with('success', 'Cirurgia removida com sucesso.');
     }

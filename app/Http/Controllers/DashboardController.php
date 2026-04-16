@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\MaterialItem;
-use App\Models\AuditLog;
+use App\Modules\Audit\Models\AuditEvent;
+use App\Modules\Material\Domain\Models\Material;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -11,23 +11,23 @@ class DashboardController extends Controller
     public function index()
     {
         $kpis = [
-            'total_in_stock' => MaterialItem::where('status', 'em_estoque')->count(),
-            'total_reserved' => MaterialItem::where('status', 'reservado')->count(),
-            'near_expiry' => MaterialItem::where('status', '!=', 'implantado_usado')
+            'total_in_stock' => Material::where('status', 'em_estoque')->count(),
+            'total_reserved' => Material::where('status', 'reservado')->count(),
+            'near_expiry' => Material::where('status', '!=', 'implantado_usado')
             ->get()
             ->filter(fn($m) => $m->isNearExpiry())
             ->count(),
-            'expired' => MaterialItem::where('status', '!=', 'implantado_usado')
+            'expired' => Material::where('status', '!=', 'implantado_usado')
             ->get()
             ->filter(fn($m) => $m->isExpired())
             ->count(),
         ];
 
-        $recent_audits = AuditLog::with(['user', 'entity' => function ($query) {
+        $recent_audits = AuditEvent::with(['user', 'entity' => function ($query) {
             $query->withTrashed();
         }])->latest()->take(10)->get();
 
-        $near_expiry_items = MaterialItem::where('status', '!=', 'implantado_usado')
+        $near_expiry_items = Material::where('status', '!=', 'implantado_usado')
             ->get()
             ->filter(fn($m) => $m->isNearExpiry())
             ->take(5);

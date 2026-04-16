@@ -111,10 +111,10 @@
                     </div>
                     <div class="flex flex-col gap-0.5">
                         <p class="text-xs font-bold text-text-primary">
-                            {{ ucfirst($audit->action) }} 
-                            @if($audit->entity_type === 'App\Models\MaterialItem')
+                            {{ ucfirst(str_replace('.', ' ', $audit->action)) }} 
+                            @if($audit->entity_type === 'material')
                                 {{ $audit->entity?->nome ?? 'Material' }}
-                            @elseif($audit->entity_type === 'App\Models\Surgery')
+                            @elseif($audit->entity_type === 'surgery')
                                 {{ $audit->entity?->paciente ?? 'Cirurgia' }}
                             @else
                                 {{ class_basename($audit->entity_type) }}

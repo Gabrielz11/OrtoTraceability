@@ -8,6 +8,10 @@
             <span class="text-xl font-semibold text-text-secondary">{{ $surgery->data_hora->format('d/m/Y H:i') }}</span>
         </div>
         <div class="flex gap-4">
+            <button onclick="generateTvUrl({{ $surgery->id }})" class="px-5 py-2.5 bg-slate-900 text-white rounded-2xl font-bold shadow-sm hover:bg-slate-800 transition flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                Monitorar na TV
+            </button>
             <a href="{{ route('surgeries.edit', $surgery) }}" class="px-5 py-2.5 bg-white border border-border text-text-primary rounded-2xl font-semibold shadow-sm hover:bg-surface transition">
                 Editar Procedimento
             </a>
@@ -18,6 +22,17 @@
                 </button>
             </form>
         </div>
+
+        <script>
+            function generateTvUrl(id) {
+                fetch(`/surgeries/${id}/display-url`)
+                    .then(r => r.json())
+                    .then(data => {
+                        window.open(data.url, '_blank');
+                    })
+                    .catch(e => alert('Erro ao gerar link da TV. Verifique os logs.'));
+            }
+        </script>
     </div>
 
     <!-- Status Banner -->

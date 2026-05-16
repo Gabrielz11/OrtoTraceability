@@ -4,8 +4,11 @@ namespace App\Modules\Material\Domain\Events;
 
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Broadcasting\Channel;
+use App\Modules\Material\Domain\Models\Material;
 
-class DivergenceDetected
+class DivergenceDetected implements ShouldBroadcastNow
 {
     use Dispatchable, SerializesModels;
 
@@ -21,5 +24,34 @@ class DivergenceDetected
         public readonly array $metadata = [],
     ) {
         $this->eventType = 'material.divergence_detected';
+    }
+
+    public function broadcastOn(): array
+    {
+        if (!$this->surgeryId) {
+            return [];
+        }
+
+        return [
+            new Channel("surgery.{$this->surgeryId}"),
+        ];
+    }
+
+    public function broadcastAs(): string
+    {
+        return 'material.divergence_detected';
+    }
+
+    public function broadcastWith(): array
+    {
+        $material = Material::find($this->materialId);
+        
+        return [
+            'type' => $this->eventType,
+            'material_id' => $this->materialId,
+            'material_name' => $material?->nome ?? 'Material',
+            'divergences' => $this->divergences,
+            'occurred_at' => $this->occurredAt,
+        ];
     }
 }

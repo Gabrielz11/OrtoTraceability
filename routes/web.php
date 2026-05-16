@@ -22,6 +22,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class , 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class , 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class , 'destroy'])->name('profile.destroy');
+
+    // Display URL generation
+    Route::get('surgeries/{surgery}/display-url', [App\Http\Controllers\DisplayController::class, 'generateUrl'])->name('surgeries.display_url');
 });
+
+// ── Public TV Display (Signed) ──────────────────────────────────
+Route::get('/display/surgery/{surgery}', [App\Http\Controllers\DisplayController::class, 'show'])
+    ->name('display.surgery')
+    ->middleware('signed');
+
+Route::get('/api/surgeries/{surgery}/materials-status', [App\Http\Controllers\DisplayController::class, 'materialsStatus']);
 
 require __DIR__ . '/auth.php';

@@ -29,6 +29,10 @@ use App\Modules\Surgery\Domain\Events\MaterialUnlinkedFromSurgery;
 use App\Modules\Audit\Listeners\AppendAuditEventListener;
 use App\Modules\Material\Application\Listeners\RecordLifecycleEventListener;
 
+// ── Validation Listeners (Sprint 4) ────────────────────────────
+use App\Modules\Validation\Listeners\TriggerValidationOnMaterialUsed;
+use App\Modules\Validation\Listeners\TriggerValidationOnMaterialAllocated;
+
 class EventServiceProvider extends ServiceProvider
 {
     /**
@@ -56,6 +60,7 @@ class EventServiceProvider extends ServiceProvider
         MaterialAllocatedToSurgery::class => [
             AppendAuditEventListener::class,
             RecordLifecycleEventListener::class,
+            TriggerValidationOnMaterialAllocated::class,
         ],
         MaterialSterilized::class => [
             AppendAuditEventListener::class,
@@ -72,6 +77,7 @@ class EventServiceProvider extends ServiceProvider
         MaterialUsed::class => [
             AppendAuditEventListener::class,
             RecordLifecycleEventListener::class,
+            TriggerValidationOnMaterialUsed::class,
         ],
         MaterialDiscarded::class => [
             AppendAuditEventListener::class,

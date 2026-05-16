@@ -4,8 +4,11 @@ namespace App\Modules\Surgery\Domain\Events;
 
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Broadcasting\Channel;
+use App\Modules\Material\Domain\Models\Material;
 
-class MaterialLinkedToSurgery
+class MaterialLinkedToSurgery implements ShouldBroadcastNow
 {
     use Dispatchable, SerializesModels;
 
@@ -20,5 +23,31 @@ class MaterialLinkedToSurgery
         public readonly array $metadata = [],
     ) {
         $this->eventType = 'surgery.material_linked';
+    }
+
+    public function broadcastOn(): array
+    {
+        return [
+            new Channel("surgery.{$this->surgeryId}"),
+        ];
+    }
+
+    public function broadcastAs(): string
+    {
+        return 'surgery.material_linked';
+    }
+
+    public function broadcastWith(): array
+    {
+        $material = Material::find($this->materialId);
+        
+        return [
+            'type' => $this->eventType,
+            'material_id' => $this->materialId,
+            'material_name' => $material?->nome ?? 'Material',
+            'material_lote' => $material?->lote ?? '',
+            'actor_role' => $this->actorRole,
+            'occurred_at' => $this->occurredAt,
+        ];
     }
 }

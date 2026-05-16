@@ -1,12 +1,16 @@
 <?php
 
 use App\Http\Controllers\AuditController;
+use App\Http\Controllers\AuthorizationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DisplayController;
 use App\Http\Controllers\DivergenceController;
+use App\Http\Controllers\KitTemplateController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StockController;
 use App\Http\Controllers\SurgeryController;
+use App\Http\Controllers\SurgeryKitController;
 use Illuminate\Support\Facades\Route;
 
 // ── Dashboard (todos os autenticados) ──────────────────────────
@@ -29,6 +33,35 @@ Route::middleware(['auth', 'role:admin,instrumentator'])->group(function () {
     Route::delete('surgeries/{surgery}/unlink/{material}', [SurgeryController::class, 'unlinkMaterial'])->name('surgeries.unlink');
     Route::post('surgeries/{surgery}/use/{material}', [SurgeryController::class, 'markAsUsed'])->name('surgeries.use');
     Route::get('surgeries/{surgery}/display-url', [DisplayController::class, 'generateUrl'])->name('surgeries.display_url');
+
+    // ── Stock (novo módulo) ──────────────────────────────────────
+    Route::resource('stock', StockController::class);
+    Route::post('stock/{stock}/discard', [StockController::class, 'discard'])->name('stock.discard');
+
+    // ── Kit Templates ────────────────────────────────────────────
+    Route::resource('kit-templates', KitTemplateController::class);
+    Route::post('kit-templates/{kitTemplate}/items', [KitTemplateController::class, 'addItem'])->name('kit-templates.add-item');
+    Route::delete('kit-templates/{kitTemplate}/items/{item}', [KitTemplateController::class, 'removeItem'])->name('kit-templates.remove-item');
+
+    // ── Surgery Kits ─────────────────────────────────────────────
+    Route::get('surgeries/{surgery}/kits/create', [SurgeryKitController::class, 'create'])->name('surgery-kits.create');
+    Route::post('surgeries/{surgery}/kits', [SurgeryKitController::class, 'store'])->name('surgery-kits.store');
+    Route::get('surgery-kits/{surgeryKit}', [SurgeryKitController::class, 'show'])->name('surgery-kits.show');
+    Route::get('surgery-kits/{surgeryKit}/resultado', [SurgeryKitController::class, 'resultado'])->name('surgery-kits.resultado');
+    Route::post('surgery-kits/{surgeryKit}/resultado', [SurgeryKitController::class, 'registrarResultados'])->name('surgery-kits.registrar-resultados');
+    Route::post('surgery-kits/{surgeryKit}/conferir', [SurgeryKitController::class, 'conferir'])->name('surgery-kits.conferir');
+    Route::post('surgery-kits/{surgeryKit}/despachar', [SurgeryKitController::class, 'despachar'])->name('surgery-kits.despachar');
+    Route::post('surgery-kits/{surgeryKit}/receber', [SurgeryKitController::class, 'confirmarRecebimento'])->name('surgery-kits.receber');
+    Route::post('surgery-kits/{surgeryKit}/devolver', [SurgeryKitController::class, 'devolver'])->name('surgery-kits.devolver');
+    Route::post('surgery-kits/{surgeryKit}/items/{item}/vincular', [SurgeryKitController::class, 'vincularItem'])->name('surgery-kits.vincular-item');
+    Route::delete('surgery-kits/{surgeryKit}/items/{item}', [SurgeryKitController::class, 'desvincularItem'])->name('surgery-kits.desvincular-item');
+
+    // ── Authorizations ───────────────────────────────────────────
+    Route::get('surgeries/{surgery}/authorization/create', [AuthorizationController::class, 'create'])->name('authorizations.create');
+    Route::post('surgeries/{surgery}/authorization', [AuthorizationController::class, 'store'])->name('authorizations.store');
+    Route::put('authorizations/{authorization}', [AuthorizationController::class, 'update'])->name('authorizations.update');
+    Route::post('authorizations/{authorization}/items', [AuthorizationController::class, 'addItem'])->name('authorizations.add-item');
+    Route::delete('authorizations/{authorization}/items/{item}', [AuthorizationController::class, 'removeItem'])->name('authorizations.remove-item');
 });
 
 // ── Admin + Auditor ─────────────────────────────────────────────

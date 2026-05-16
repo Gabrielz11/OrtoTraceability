@@ -25,6 +25,21 @@ use App\Modules\Surgery\Domain\Events\SurgeryCompleted;
 use App\Modules\Surgery\Domain\Events\MaterialLinkedToSurgery;
 use App\Modules\Surgery\Domain\Events\MaterialUnlinkedFromSurgery;
 
+// ── Stock Events ───────────────────────────────────────────────
+use App\Modules\Stock\Domain\Events\StockItemReceived;
+use App\Modules\Stock\Domain\Events\StockItemReserved;
+use App\Modules\Stock\Domain\Events\StockItemDispatched;
+use App\Modules\Stock\Domain\Events\StockItemUsed;
+use App\Modules\Stock\Domain\Events\StockItemDiscarded;
+use App\Modules\Stock\Domain\Events\StockItemReturned;
+
+// ── Kit Events ─────────────────────────────────────────────────
+use App\Modules\Kit\Domain\Events\KitMontado;
+use App\Modules\Kit\Domain\Events\KitConferido;
+use App\Modules\Kit\Domain\Events\KitDespachado;
+use App\Modules\Kit\Domain\Events\KitRecebidoHospital;
+use App\Modules\Kit\Domain\Events\KitDevolvido;
+
 // ── Listeners ──────────────────────────────────────────────────
 use App\Modules\Audit\Listeners\AppendAuditEventListener;
 use App\Modules\Material\Application\Listeners\RecordLifecycleEventListener;
@@ -115,6 +130,43 @@ class EventServiceProvider extends ServiceProvider
         MaterialUnlinkedFromSurgery::class => [
             AppendAuditEventListener::class,
             RecordLifecycleEventListener::class,
+        ],
+
+        // ── Stock Events ───────────────────────────────────────
+        StockItemReceived::class => [
+            AppendAuditEventListener::class,
+        ],
+        StockItemReserved::class => [
+            AppendAuditEventListener::class,
+        ],
+        StockItemDispatched::class => [
+            AppendAuditEventListener::class,
+        ],
+        StockItemUsed::class => [
+            AppendAuditEventListener::class,
+        ],
+        StockItemDiscarded::class => [
+            AppendAuditEventListener::class,
+        ],
+        StockItemReturned::class => [
+            AppendAuditEventListener::class,
+        ],
+
+        // ── Kit Events ─────────────────────────────────────────
+        KitMontado::class => [
+            AppendAuditEventListener::class,
+        ],
+        KitConferido::class => [
+            AppendAuditEventListener::class,
+        ],
+        KitDespachado::class => [
+            AppendAuditEventListener::class,
+        ],
+        KitRecebidoHospital::class => [
+            AppendAuditEventListener::class,
+        ],
+        KitDevolvido::class => [
+            AppendAuditEventListener::class,
         ],
     ];
 

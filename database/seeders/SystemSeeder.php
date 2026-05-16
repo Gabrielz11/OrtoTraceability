@@ -3,8 +3,12 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Modules\Kit\Domain\Models\KitTemplate;
+use App\Modules\Kit\Domain\Models\KitTemplateItem;
 use App\Modules\Material\Domain\Models\Material;
 use App\Modules\Material\Domain\Models\MaterialLifecycleEvent;
+use App\Modules\Stock\Domain\Models\ProductTemplate;
+use App\Modules\Stock\Domain\Models\StockItem;
 use App\Modules\Surgery\Domain\Models\Surgery;
 use App\Modules\Validation\Domain\Models\Divergence;
 use Illuminate\Database\Seeder;
@@ -215,5 +219,81 @@ class SystemSeeder extends Seeder
             'acknowledged_at' => now()->subDays(9),
             'occurred_at'     => now()->subDays(10),
         ]);
+
+        // ── Catálogo de Produtos ────────────────────────────────
+        $productsData = [
+            ['codigo' => 'MED-CUPULA-52',    'nome' => 'Cúpula Acetabular 52mm',      'fabricante' => 'Medacta', 'tipo' => 'implante_esteril', 'categoria' => 'protese_quadril', 'requer_numero_serie' => true],
+            ['codigo' => 'MED-CUPULA-54',    'nome' => 'Cúpula Acetabular 54mm',      'fabricante' => 'Medacta', 'tipo' => 'implante_esteril', 'categoria' => 'protese_quadril', 'requer_numero_serie' => true],
+            ['codigo' => 'MED-CABECA-CER-28','nome' => 'Cabeça Cerâmica 28mm',        'fabricante' => 'Medacta', 'tipo' => 'implante_esteril', 'categoria' => 'protese_quadril', 'requer_numero_serie' => true],
+            ['codigo' => 'MED-CABECA-MET-28','nome' => 'Cabeça Metálica 28mm',        'fabricante' => 'Medacta', 'tipo' => 'implante_esteril', 'categoria' => 'protese_quadril', 'requer_numero_serie' => true],
+            ['codigo' => 'MED-HASTE-12',     'nome' => 'Haste Femoral 12mm',          'fabricante' => 'Medacta', 'tipo' => 'implante_esteril', 'categoria' => 'protese_quadril', 'requer_numero_serie' => true],
+            ['codigo' => 'MED-HASTE-14',     'nome' => 'Haste Femoral 14mm',          'fabricante' => 'Medacta', 'tipo' => 'implante_esteril', 'categoria' => 'protese_quadril', 'requer_numero_serie' => true],
+            ['codigo' => 'MED-INSERT-PE',    'nome' => 'Insert de Polietileno 52mm',  'fabricante' => 'Medacta', 'tipo' => 'implante_esteril', 'categoria' => 'protese_quadril', 'requer_numero_serie' => false],
+            ['codigo' => 'MED-CX-QUADRIL',   'nome' => 'Caixa Cirúrgica Quadril Medacta', 'fabricante' => 'Medacta', 'tipo' => 'instrumental', 'categoria' => 'protese_quadril', 'requer_numero_serie' => false, 'requer_lote' => false],
+            ['codigo' => 'MED-PROVAS-QDL',   'nome' => 'Set de Provas Quadril',       'fabricante' => 'Medacta', 'tipo' => 'instrumental', 'categoria' => 'protese_quadril', 'requer_numero_serie' => false, 'requer_lote' => false],
+            ['codigo' => 'CONS-CIMENTO-SX',  'nome' => 'Cimento Ósseo Simplex 40g',  'fabricante' => 'Stryker', 'tipo' => 'consumivel', 'categoria' => 'consumivel_geral', 'requer_lote' => true],
+            ['codigo' => 'CONS-IOBAN-35',    'nome' => 'Ioban 35×45cm',              'fabricante' => '3M',      'tipo' => 'consumivel', 'categoria' => 'consumivel_geral', 'requer_lote' => false],
+            ['codigo' => 'CONS-CIMENTO-ATB', 'nome' => 'Cimento c/ Antibiótico Palacos R+G', 'fabricante' => 'Heraeus', 'tipo' => 'consumivel', 'categoria' => 'consumivel_geral', 'requer_lote' => true],
+        ];
+
+        $catalogProducts = [];
+        foreach ($productsData as $pd) {
+            $catalogProducts[] = ProductTemplate::create(array_merge([
+                'requer_numero_serie' => false,
+                'requer_lote'         => true,
+                'ativo'               => true,
+                'codigo_anvisa'       => null,
+                'unidade_medida'      => 'unidade',
+                'observacoes'         => null,
+            ], $pd));
+        }
+
+        // ── Template de Kit: Artroplastia Total de Quadril Medacta ──
+        $kitImplante = KitTemplate::create([
+            'nome'        => 'Kit Prótese Quadril Medacta — Implantes',
+            'fabricante'  => 'Medacta',
+            'procedimento' => 'Artroplastia Total de Quadril',
+            'tipo_kit'    => 'implante',
+            'descricao'   => 'Kit completo de implantes estéreis para ATQ Medacta.',
+        ]);
+
+        // Cúpula (essencial, 3 tamanhos recomendados)
+        KitTemplateItem::create(['kit_template_id' => $kitImplante->id, 'product_template_id' => $catalogProducts[0]->id, 'quantidade_minima' => 1, 'quantidade_recomendada' => 2, 'criticidade' => 'essencial', 'observacoes' => 'Enviar tamanhos 52 e 54']);
+        KitTemplateItem::create(['kit_template_id' => $kitImplante->id, 'product_template_id' => $catalogProducts[1]->id, 'quantidade_minima' => 0, 'quantidade_recomendada' => 1, 'criticidade' => 'sobressalente', 'observacoes' => 'Tamanho extra']);
+        // Cabeça cerâmica (essencial)
+        KitTemplateItem::create(['kit_template_id' => $kitImplante->id, 'product_template_id' => $catalogProducts[2]->id, 'quantidade_minima' => 1, 'quantidade_recomendada' => 2, 'criticidade' => 'essencial']);
+        // Cabeça metálica (sobressalente)
+        KitTemplateItem::create(['kit_template_id' => $kitImplante->id, 'product_template_id' => $catalogProducts[3]->id, 'quantidade_minima' => 0, 'quantidade_recomendada' => 1, 'criticidade' => 'sobressalente']);
+        // Haste femoral (essencial)
+        KitTemplateItem::create(['kit_template_id' => $kitImplante->id, 'product_template_id' => $catalogProducts[4]->id, 'quantidade_minima' => 1, 'quantidade_recomendada' => 2, 'criticidade' => 'essencial', 'observacoes' => 'Tamanhos 12 e 14']);
+        // Insert (essencial)
+        KitTemplateItem::create(['kit_template_id' => $kitImplante->id, 'product_template_id' => $catalogProducts[6]->id, 'quantidade_minima' => 1, 'quantidade_recomendada' => 1, 'criticidade' => 'essencial']);
+
+        $kitInstrumental = KitTemplate::create([
+            'nome'        => 'Kit Caixa Cirúrgica Quadril Medacta — Instrumental',
+            'fabricante'  => 'Medacta',
+            'procedimento' => 'Artroplastia Total de Quadril',
+            'tipo_kit'    => 'instrumental',
+        ]);
+
+        KitTemplateItem::create(['kit_template_id' => $kitInstrumental->id, 'product_template_id' => $catalogProducts[7]->id, 'quantidade_minima' => 1, 'quantidade_recomendada' => 1, 'criticidade' => 'essencial']);
+        KitTemplateItem::create(['kit_template_id' => $kitInstrumental->id, 'product_template_id' => $catalogProducts[8]->id, 'quantidade_minima' => 1, 'quantidade_recomendada' => 1, 'criticidade' => 'essencial']);
+
+        // ── Stock Items (instâncias físicas dos produtos) ───────
+        StockItem::create(['product_template_id' => $catalogProducts[0]->id, 'lote' => 'MED-CUP52-A', 'numero_serie' => 'SN-CUP-0001', 'validade' => now()->addMonths(24), 'tamanho' => '52mm', 'status' => 'em_estoque', 'quantidade' => 1]);
+        StockItem::create(['product_template_id' => $catalogProducts[0]->id, 'lote' => 'MED-CUP52-B', 'numero_serie' => 'SN-CUP-0002', 'validade' => now()->addMonths(18), 'tamanho' => '52mm', 'status' => 'em_estoque', 'quantidade' => 1]);
+        StockItem::create(['product_template_id' => $catalogProducts[1]->id, 'lote' => 'MED-CUP54-A', 'numero_serie' => 'SN-CUP-0003', 'validade' => now()->addMonths(24), 'tamanho' => '54mm', 'status' => 'em_estoque', 'quantidade' => 1]);
+        StockItem::create(['product_template_id' => $catalogProducts[2]->id, 'lote' => 'MED-CAB-CER-A', 'numero_serie' => 'SN-CAB-0001', 'validade' => now()->addMonths(36), 'tamanho' => '28mm', 'status' => 'em_estoque', 'quantidade' => 1]);
+        StockItem::create(['product_template_id' => $catalogProducts[2]->id, 'lote' => 'MED-CAB-CER-B', 'numero_serie' => 'SN-CAB-0002', 'validade' => now()->addMonths(30), 'tamanho' => '28mm', 'status' => 'em_estoque', 'quantidade' => 1]);
+        StockItem::create(['product_template_id' => $catalogProducts[3]->id, 'lote' => 'MED-CAB-MET-A', 'numero_serie' => 'SN-CABM-001', 'validade' => now()->addMonths(36), 'tamanho' => '28mm', 'status' => 'em_estoque', 'quantidade' => 1]);
+        StockItem::create(['product_template_id' => $catalogProducts[4]->id, 'lote' => 'MED-HASTE-A',   'numero_serie' => 'SN-HASTE-001', 'validade' => now()->addMonths(24), 'tamanho' => '12mm', 'status' => 'em_estoque', 'quantidade' => 1]);
+        StockItem::create(['product_template_id' => $catalogProducts[5]->id, 'lote' => 'MED-HASTE-B',   'numero_serie' => 'SN-HASTE-002', 'validade' => now()->addMonths(20), 'tamanho' => '14mm', 'status' => 'em_estoque', 'quantidade' => 1]);
+        StockItem::create(['product_template_id' => $catalogProducts[6]->id, 'lote' => 'MED-INS-A',     'numero_serie' => null,            'validade' => now()->addMonths(24), 'tamanho' => '52mm', 'status' => 'em_estoque', 'quantidade' => 2]);
+        StockItem::create(['product_template_id' => $catalogProducts[9]->id, 'lote' => 'CIMENTO-LOT-A', 'numero_serie' => null, 'validade' => now()->addDays(15), 'status' => 'em_estoque', 'quantidade' => 3]);
+        StockItem::create(['product_template_id' => $catalogProducts[10]->id,'lote' => null,             'numero_serie' => null, 'validade' => null,                'status' => 'em_estoque', 'quantidade' => 10]);
+        StockItem::create(['product_template_id' => $catalogProducts[11]->id,'lote' => 'PAL-LOT-A',     'numero_serie' => null, 'validade' => now()->addMonths(12), 'status' => 'em_estoque', 'quantidade' => 2]);
+        // Caixa instrumental (sem validade, sem lote)
+        StockItem::create(['product_template_id' => $catalogProducts[7]->id, 'lote' => null, 'numero_serie' => 'CX-QDL-001', 'validade' => null, 'status' => 'em_estoque', 'quantidade' => 1]);
+        StockItem::create(['product_template_id' => $catalogProducts[8]->id, 'lote' => null, 'numero_serie' => 'PROVAS-001',  'validade' => null, 'status' => 'em_estoque', 'quantidade' => 1]);
     }
 }

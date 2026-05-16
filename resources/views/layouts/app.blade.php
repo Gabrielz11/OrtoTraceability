@@ -72,6 +72,16 @@
                     Divergências
                 </a>
                 @endif
+                @if(in_array(auth()->user()->role ?? '', ['admin', 'instrumentator']))
+                <a href="{{ route('stock.index') }}" class="flex items-center gap-3 p-3 rounded-xl {{ request()->routeIs('stock.*') ? 'bg-primary text-white shadow-sm' : 'text-text-secondary hover:bg-white transition' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                    Estoque
+                </a>
+                <a href="{{ route('kit-templates.index') }}" class="flex items-center gap-3 p-3 rounded-xl {{ request()->routeIs('kit-templates.*') || request()->routeIs('surgery-kits.*') ? 'bg-primary text-white shadow-sm' : 'text-text-secondary hover:bg-white transition' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    Kits Cirúrgicos
+                </a>
+                @endif
             </nav>
 
             <div class="mt-auto pt-6 border-t border-border">

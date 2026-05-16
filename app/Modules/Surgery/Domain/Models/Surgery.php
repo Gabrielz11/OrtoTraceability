@@ -2,9 +2,13 @@
 
 namespace App\Modules\Surgery\Domain\Models;
 
+use App\Modules\Authorization\Domain\Models\Authorization;
+use App\Modules\Kit\Domain\Models\SurgeryKit;
 use App\Modules\Material\Domain\Models\Material;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Surgery extends Model
@@ -38,5 +42,15 @@ class Surgery extends Model
         return $this->belongsToMany(Material::class, 'surgery_material', 'surgery_id', 'material_item_id')
             ->withPivot('acao')
             ->withTimestamps();
+    }
+
+    public function kits(): HasMany
+    {
+        return $this->hasMany(SurgeryKit::class);
+    }
+
+    public function authorization(): HasOne
+    {
+        return $this->hasOne(Authorization::class);
     }
 }

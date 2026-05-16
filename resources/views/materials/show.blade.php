@@ -23,7 +23,8 @@
     <!-- Tab Bar -->
     <div class="flex border-b border-border mb-4">
         <button @click="tab = 'info'" :class="tab === 'info' ? 'border-primary text-primary' : 'border-transparent text-text-secondary'" class="px-6 py-3 font-semibold border-b-2 transition">Informações Gerais</button>
-        <button @click="tab = 'history'" :class="tab === 'history' ? 'border-primary text-primary' : 'border-transparent text-text-secondary'" class="px-6 py-3 font-semibold border-b-2 transition">Histórico / Auditoria</button>
+        <button @click="tab = 'lifecycle'" :class="tab === 'lifecycle' ? 'border-primary text-primary' : 'border-transparent text-text-secondary'" class="px-6 py-3 font-semibold border-b-2 transition">Ciclo de Vida</button>
+        <button @click="tab = 'history'" :class="tab === 'history' ? 'border-primary text-primary' : 'border-transparent text-text-secondary'" class="px-6 py-3 font-semibold border-b-2 transition">Auditoria</button>
     </div>
 
     <!-- Info Tab -->
@@ -71,6 +72,35 @@
             @endif
         </div>
 
+        {{-- Painel de Transição de Status --}}
+        <div class="bg-surface rounded-2xl border border-border p-6 shadow-sm flex flex-col gap-4">
+            <h3 class="text-base font-bold text-text-primary">Alterar Status</h3>
+            <form action="{{ route('materials.change_status', $material) }}" method="POST" class="flex flex-col gap-3">
+                @csrf
+                <div>
+                    <label class="text-xs font-bold text-text-secondary uppercase tracking-wider">Novo Status</label>
+                    <select name="status" required class="mt-1 w-full bg-white border border-border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-primary/30 outline-none">
+                        <option value="em_estoque"              @selected($material->status === 'em_estoque')>Em Estoque</option>
+                        <option value="reservado"               @selected($material->status === 'reservado')>Reservado</option>
+                        <option value="implantado_usado"        @selected($material->status === 'implantado_usado')>Implantado/Usado</option>
+                        <option value="descartado"              @selected($material->status === 'descartado')>Descartado</option>
+                        <option value="devolvido_ao_fornecedor" @selected($material->status === 'devolvido_ao_fornecedor')>Devolvido ao Fornecedor</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-text-secondary uppercase tracking-wider">Cirurgia (se aplicável)</label>
+                    <input type="number" name="surgery_id" placeholder="ID da cirurgia" class="mt-1 w-full bg-white border border-border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-primary/30 outline-none">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-text-secondary uppercase tracking-wider">Observação</label>
+                    <textarea name="observacoes" rows="2" placeholder="Motivo da transição..." class="mt-1 w-full bg-white border border-border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-primary/30 outline-none resize-none"></textarea>
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-primary text-white rounded-xl text-sm font-bold hover:bg-primary/90 transition">
+                    Confirmar Transição
+                </button>
+            </form>
+        </div>
+
         <div class="bg-surface rounded-2xl border border-border p-8 shadow-sm">
             <h3 class="text-lg font-bold text-text-primary mb-6">Vínculos de Cirurgia</h3>
             @php $current_surgery = $material->surgeries->last(); @endphp
@@ -91,6 +121,56 @@
                 </div>
             @endif
         </div>
+    </div>
+
+    <!-- Lifecycle Tab -->
+    <div x-show="tab === 'lifecycle'" class="bg-white rounded-2xl border border-border p-8 shadow-sm">
+        <h3 class="text-lg font-bold text-text-primary mb-6">Ciclo de Vida do Material</h3>
+        @php $events = $material->lifecycleEvents; @endphp
+        @if($events->isEmpty())
+            <p class="text-center text-text-secondary italic py-8">Nenhum evento de ciclo de vida registrado.</p>
+        @else
+        <div class="flex flex-col gap-0 relative before:absolute before:left-3.5 before:top-4 before:bottom-4 before:w-0.5 before:bg-border">
+            @foreach($events as $ev)
+            @php
+                $evColors = [
+                    'material.received'           => 'bg-green-100 text-success',
+                    'material.updated'            => 'bg-blue-100 text-primary',
+                    'material.allocated_to_surgery' => 'bg-yellow-100 text-warning',
+                    'material.used'               => 'bg-green-200 text-success',
+                    'material.discarded'          => 'bg-gray-100 text-gray-500',
+                    'material.returned'           => 'bg-purple-100 text-purple-600',
+                    'material.divergence_detected' => 'bg-red-100 text-danger',
+                ];
+                $evColor = $evColors[$ev->event_type] ?? 'bg-surface text-text-secondary';
+            @endphp
+            <div class="flex gap-6 pb-6 relative">
+                <div class="w-7 h-7 rounded-full border-4 border-white z-10 flex-shrink-0 flex items-center justify-center {{ $evColor }}">
+                    <span class="text-[8px] font-bold">{{ strtoupper(substr(str_replace('material.', '', $ev->event_type), 0, 2)) }}</span>
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="px-2 py-0.5 rounded-full text-xs font-medium {{ $evColor }}">
+                            {{ str_replace(['material.', '_'], ['', ' '], $ev->event_type) }}
+                        </span>
+                        @if($ev->surgery)
+                            <span class="text-xs text-text-secondary">— {{ $ev->surgery->hospital }}</span>
+                        @endif
+                    </div>
+                    <p class="text-xs text-text-secondary mt-1">
+                        {{ $ev->occurred_at->format('d/m/Y H:i') }}
+                        @if($ev->actor_role) • <span class="font-medium">{{ ucfirst($ev->actor_role) }}</span> @endif
+                    </p>
+                    @if(!empty($ev->payload))
+                    <div class="mt-2 text-[10px] font-mono bg-surface border border-border rounded-lg px-3 py-2 text-text-secondary">
+                        {{ json_encode($ev->payload) }}
+                    </div>
+                    @endif
+                </div>
+            </div>
+            @endforeach
+        </div>
+        @endif
     </div>
 
     <!-- History Tab -->

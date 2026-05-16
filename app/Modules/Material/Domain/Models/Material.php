@@ -3,12 +3,13 @@
 namespace App\Modules\Material\Domain\Models;
 
 use App\Modules\Surgery\Domain\Models\Surgery;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Material extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'material_items';
 
@@ -25,6 +26,11 @@ class Material extends Model
     protected $casts = [
         'validade' => 'date',
     ];
+
+    protected static function newFactory()
+    {
+        return \Database\Factories\MaterialFactory::new();
+    }
 
     // ── Relationships ──────────────────────────────────────────
 
@@ -50,6 +56,7 @@ class Material extends Model
 
     public function isNearExpiry(int $days = 30): bool
     {
-        return $this->validade->diffInDays(now()) <= $days && !$this->isExpired();
+        // now()->diffInDays(validade) returns positive for future dates (Carbon 3 compatible)
+        return now()->diffInDays($this->validade) <= $days && !$this->isExpired();
     }
 }

@@ -3,6 +3,8 @@
 namespace App\Modules\Audit\Listeners;
 
 use App\Modules\Audit\Models\AuditEvent;
+use App\Modules\Material\Domain\Events\DivergenceDetected;
+use App\Modules\Validation\Domain\Models\Divergence;
 use Illuminate\Support\Str;
 
 /**
@@ -25,6 +27,20 @@ class AppendAuditEventListener
             'after'         => property_exists($event, 'after') ? $event->after : null,
             'metadata'      => $this->buildMetadata($event),
         ]);
+
+        if ($event instanceof DivergenceDetected) {
+            foreach ($event->divergences as $divergence) {
+                Divergence::create([
+                    'material_id' => $event->materialId,
+                    'surgery_id'  => $event->surgeryId,
+                    'rule_name'   => $divergence['rule'] ?? 'unknown',
+                    'severity'    => $divergence['severity'],
+                    'message'     => $divergence['message'],
+                    'context'     => $divergence['context'] ?? null,
+                    'occurred_at' => $event->occurredAt,
+                ]);
+            }
+        }
     }
 
     private function resolveEntityId(object $event, string $entityType): int

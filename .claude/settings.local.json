@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"C:/Users/gabri/Documents/PROJECTS/PROJETOS LIMPOS/Projeto - Rastreabilidade\" && php artisan test --filter=\"ValidationEngineTest|MaterialLifecycleTest|SurgeryWorkflowTest\" 2>&1)"
+    ]
+  }
+}

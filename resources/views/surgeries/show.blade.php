@@ -47,7 +47,24 @@
             </div>
         </div>
         <div class="flex gap-2">
-            <!-- CTAs for status update could go here -->
+            @if($surgery->status === 'agendada')
+                <form action="{{ route('surgeries.change_status', $surgery) }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="status" value="realizada">
+                    <button type="submit" onclick="return confirm('Marcar esta cirurgia como realizada?')"
+                        class="px-4 py-2 bg-success text-white rounded-xl text-sm font-bold shadow-sm hover:bg-green-700 transition">
+                        Marcar como Realizada
+                    </button>
+                </form>
+                <form action="{{ route('surgeries.change_status', $surgery) }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="status" value="cancelada">
+                    <button type="submit" onclick="return confirm('Cancelar esta cirurgia?')"
+                        class="px-4 py-2 bg-white border border-danger text-danger rounded-xl text-sm font-bold shadow-sm hover:bg-red-50 transition">
+                        Cancelar Cirurgia
+                    </button>
+                </form>
+            @endif
         </div>
     </div>
 

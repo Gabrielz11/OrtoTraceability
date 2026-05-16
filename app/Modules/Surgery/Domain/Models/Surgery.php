@@ -3,12 +3,13 @@
 namespace App\Modules\Surgery\Domain\Models;
 
 use App\Modules\Material\Domain\Models\Material;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Surgery extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'surgeries';
 
@@ -24,6 +25,11 @@ class Surgery extends Model
     protected $casts = [
         'data_hora' => 'datetime',
     ];
+
+    protected static function newFactory()
+    {
+        return \Database\Factories\SurgeryFactory::new();
+    }
 
     // ── Relationships ──────────────────────────────────────────
 

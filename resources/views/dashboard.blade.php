@@ -15,7 +15,7 @@
     </div>
 
     <!-- KPI Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
         <div class="bg-white p-6 rounded-2xl border border-border shadow-sm flex flex-col gap-2">
             <span class="text-xs font-bold text-text-secondary uppercase">Em Estoque</span>
             <div class="flex items-baseline gap-2">
@@ -49,6 +49,22 @@
                 <span class="text-xs text-text-secondary">itens</span>
             </div>
             <p class="text-[10px] text-danger font-semibold">Ação imediata necessária</p>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-border shadow-sm flex flex-col gap-2 border-l-4 border-l-orange-400">
+            <span class="text-xs font-bold text-text-secondary uppercase">Divergências Abertas</span>
+            <div class="flex items-baseline gap-2">
+                <span class="text-3xl font-bold text-orange-600">{{ $kpis['open_divergences'] }}</span>
+                <span class="text-xs text-text-secondary">alertas</span>
+            </div>
+            <a href="{{ route('divergences.index') }}" class="text-[10px] text-orange-600 font-semibold hover:underline">Ver divergências</a>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-border shadow-sm flex flex-col gap-2 border-l-4 border-l-red-600">
+            <span class="text-xs font-bold text-text-secondary uppercase">Divergências Críticas</span>
+            <div class="flex items-baseline gap-2">
+                <span class="text-3xl font-bold text-danger">{{ $kpis['critical_divergences'] }}</span>
+                <span class="text-xs text-text-secondary">críticas</span>
+            </div>
+            <p class="text-[10px] text-danger font-semibold">Requerem ação imediata</p>
         </div>
     </div>
 

@@ -118,6 +118,21 @@ class SurgeryController extends Controller
         }
     }
 
+    public function changeStatus(Request $request, Surgery $surgery)
+    {
+        $request->validate([
+            'status' => 'required|in:agendada,realizada,cancelada',
+        ]);
+
+        // Pass existing surgery data + new status to the service so events are dispatched correctly
+        $data = $surgery->only(['data_hora', 'hospital', 'medico', 'paciente', 'observacoes']);
+        $data['status'] = $request->status;
+
+        $this->surgeryService->update($surgery, $data);
+
+        return back()->with('success', 'Status da cirurgia atualizado.');
+    }
+
     public function destroy(Surgery $surgery)
     {
         $this->surgeryService->delete($surgery);

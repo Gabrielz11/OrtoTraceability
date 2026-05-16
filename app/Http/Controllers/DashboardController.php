@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Modules\Audit\Models\AuditEvent;
 use App\Modules\Material\Domain\Models\Material;
+use App\Modules\Validation\Domain\Models\Divergence;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -21,6 +22,8 @@ class DashboardController extends Controller
             ->get()
             ->filter(fn($m) => $m->isExpired())
             ->count(),
+            'open_divergences'     => Divergence::where('status', 'open')->count(),
+            'critical_divergences' => Divergence::where('status', 'open')->where('severity', 'critical')->count(),
         ];
 
         $recent_audits = AuditEvent::with(['user', 'entity' => function ($query) {

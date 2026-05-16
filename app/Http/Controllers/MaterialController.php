@@ -4,8 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Modules\Audit\Models\AuditEvent;
 use App\Modules\Material\Application\Services\MaterialCrudService;
+use App\Modules\Material\Domain\Events\MaterialAllocatedToSurgery;
+use App\Modules\Material\Domain\Events\MaterialDiscarded;
+use App\Modules\Material\Domain\Events\MaterialReturned;
+use App\Modules\Material\Domain\Events\MaterialUsed;
 use App\Modules\Material\Domain\Models\Material;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
 
 class MaterialController extends Controller
 {
@@ -26,8 +31,11 @@ class MaterialController extends Controller
         if ($request->lote) {
             $query->where('lote', 'like', "%{$request->lote}%");
         }
+        if ($request->numero_serie) {
+            $query->where('numero_serie', 'like', "%{$request->numero_serie}%");
+        }
 
-        $materials = $query->latest()->paginate(15);
+        $materials = $query->latest()->paginate(25);
         return view('materials.index', compact('materials'));
     }
 
@@ -93,5 +101,63 @@ class MaterialController extends Controller
 
         return redirect()->route('materials.index')
             ->with('success', 'Material removido com sucesso.');
+    }
+
+    public function changeStatus(Request $request, Material $material)
+    {
+        $validated = $request->validate([
+            'status' => 'required|in:em_estoque,reservado,implantado_usado,descartado,devolvido_ao_fornecedor',
+            'surgery_id' => 'nullable|exists:surgeries,id',
+            'observacoes' => 'nullable|string',
+        ]);
+
+        $newStatus = $validated['status'];
+        $surgeryId = $validated['surgery_id'] ?? null;
+        $actorId   = auth()->id();
+        $actorRole = auth()->user()->role ?? 'admin';
+        $now       = now()->toISOString();
+        $meta      = ['ip' => $request->ip(), 'observacoes' => $validated['observacoes'] ?? null];
+
+        if (in_array($newStatus, ['implantado_usado', 'reservado']) && ! $surgeryId) {
+            return back()->with('error', 'Informe a cirurgia para este status.');
+        }
+
+        $material->update(['status' => $newStatus]);
+
+        match ($newStatus) {
+            'implantado_usado' => Event::dispatch(new MaterialUsed(
+                materialId: $material->id,
+                surgeryId:  (int) $surgeryId,
+                actorId:    $actorId,
+                actorRole:  $actorRole,
+                occurredAt: $now,
+                metadata:   $meta,
+            )),
+            'descartado' => Event::dispatch(new MaterialDiscarded(
+                materialId: $material->id,
+                actorId:    $actorId,
+                actorRole:  $actorRole,
+                occurredAt: $now,
+                metadata:   $meta,
+            )),
+            'devolvido_ao_fornecedor' => Event::dispatch(new MaterialReturned(
+                materialId: $material->id,
+                actorId:    $actorId,
+                actorRole:  $actorRole,
+                occurredAt: $now,
+                metadata:   $meta,
+            )),
+            'reservado' => Event::dispatch(new MaterialAllocatedToSurgery(
+                materialId: $material->id,
+                surgeryId:  (int) $surgeryId,
+                actorId:    $actorId,
+                actorRole:  $actorRole,
+                occurredAt: $now,
+                metadata:   $meta,
+            )),
+            default => null,
+        };
+
+        return back()->with('success', 'Status do material atualizado.');
     }
 }

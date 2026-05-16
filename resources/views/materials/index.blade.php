@@ -19,9 +19,13 @@
                 <label class="block text-sm font-semibold text-text-secondary mb-2">Filtrar por Nome</label>
                 <input type="text" name="nome" value="{{ request('nome') }}" placeholder="Ex: Placa..." class="w-full bg-white border border-border rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none">
             </div>
-            <div class="flex-1 min-w-[200px]">
+            <div class="flex-1 min-w-[180px]">
                 <label class="block text-sm font-semibold text-text-secondary mb-2">Filtrar por Lote</label>
                 <input type="text" name="lote" value="{{ request('lote') }}" placeholder="Ex: L123..." class="w-full bg-white border border-border rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none">
+            </div>
+            <div class="flex-1 min-w-[180px]">
+                <label class="block text-sm font-semibold text-text-secondary mb-2">Número de Série</label>
+                <input type="text" name="numero_serie" value="{{ request('numero_serie') }}" placeholder="Ex: SN-001..." class="w-full bg-white border border-border rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none">
             </div>
             <div class="flex-1 min-w-[200px]">
                 <label class="block text-sm font-semibold text-text-secondary mb-2">Filtrar por Status</label>

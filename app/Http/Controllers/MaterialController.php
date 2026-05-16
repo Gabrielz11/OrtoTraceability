@@ -35,7 +35,7 @@ class MaterialController extends Controller
             $query->where('numero_serie', 'like', "%{$request->numero_serie}%");
         }
 
-        $materials = $query->latest()->paginate(25);
+        $materials = $query->latest()->paginate(10)->withQueryString();
         return view('materials.index', compact('materials'));
     }
 

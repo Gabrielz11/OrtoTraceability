@@ -20,7 +20,7 @@ class DivergenceController extends Controller
             $query->where('status', $request->status);
         }
 
-        $divergences = $query->paginate(25)->withQueryString();
+        $divergences = $query->paginate(15)->withQueryString();
 
         return view('divergences.index', compact('divergences'));
     }

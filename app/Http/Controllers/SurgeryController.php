@@ -25,7 +25,7 @@ class SurgeryController extends Controller
             $query->where('status', $request->status);
         }
 
-        $surgeries = $query->latest()->paginate(15);
+        $surgeries = $query->latest()->paginate(10)->withQueryString();
         return view('surgeries.index', compact('surgeries'));
     }
 

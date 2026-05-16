@@ -31,7 +31,7 @@ class StockController extends Controller
             $query->where('lote', 'like', "%{$request->lote}%");
         }
 
-        $stockItems  = $query->latest()->paginate(25)->withQueryString();
+        $stockItems  = $query->latest()->paginate(10)->withQueryString();
         $fabricantes = ProductTemplate::distinct()->orderBy('fabricante')->pluck('fabricante');
 
         return view('stock.index', compact('stockItems', 'fabricantes'));

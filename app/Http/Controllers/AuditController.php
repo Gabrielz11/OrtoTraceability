@@ -17,7 +17,7 @@ class AuditController extends Controller
             $query->where('action', $request->action);
         }
 
-        $logs = $query->paginate(30);
+        $logs = $query->paginate(15)->withQueryString();
         return view('audit.index', compact('logs'));
     }
 }

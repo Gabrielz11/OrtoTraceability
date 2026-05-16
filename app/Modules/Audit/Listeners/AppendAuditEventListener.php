@@ -51,6 +51,8 @@ class AppendAuditEventListener
         return match ($entityType) {
             'material' => $event->materialId,
             'surgery'  => $event->surgeryId,
+            'kit'      => $event->surgeryKitId,
+            'stock'    => $event->stockItemId,
             default    => 0,
         };
     }

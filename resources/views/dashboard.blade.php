@@ -148,5 +148,49 @@
             </a>
         </div>
     </div>
+
+    {{-- Live divergence feed (Reverb) --}}
+    @if(in_array(auth()->user()->role ?? '', ['admin', 'auditor', 'instrumentator']))
+    <div
+        id="divergence-feed"
+        x-data="{
+            alerts: [],
+            init() {
+                if (typeof Echo === 'undefined') return;
+                Echo.private('audit')
+                    .listen('.divergence.detected', (e) => {
+                        this.alerts.unshift(e);
+                        if (this.alerts.length > 20) this.alerts.pop();
+                    });
+            }
+        }"
+        class="bg-white rounded-2xl border border-border shadow-sm p-6"
+    >
+        <h3 class="font-bold text-text-primary mb-4">Alertas em Tempo Real</h3>
+
+        <div x-show="alerts.length === 0" class="text-sm text-text-secondary italic">
+            Nenhuma divergência detectada no momento.
+        </div>
+
+        <template x-for="alert in alerts" :key="alert.occurred_at">
+            <div
+                class="flex items-center gap-3 p-3 rounded-xl mb-2 border text-sm"
+                :class="alert.has_critical
+                    ? 'bg-red-50 border-red-200 text-danger'
+                    : 'bg-amber-50 border-amber-200 text-warning'"
+            >
+                <span x-text="alert.has_critical ? '🔴' : '⚠️'"></span>
+                <span>
+                    <strong x-text="alert.divergence_count + ' divergência(s)'"></strong>
+                    detectada(s)
+                    <span x-show="alert.surgery_id">
+                        — cirurgia <span x-text="'#' + alert.surgery_id"></span>
+                    </span>
+                </span>
+                <span class="ml-auto text-xs opacity-60" x-text="alert.occurred_at"></span>
+            </div>
+        </template>
+    </div>
+    @endif
 </div>
 @endsection

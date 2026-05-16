@@ -172,5 +172,54 @@
             @endforelse
         </div>
     </div>
+
+    {{-- Kits desta cirurgia com live status --}}
+    @if($surgery->kits && $surgery->kits->count() > 0)
+    <div class="bg-white rounded-2xl border border-border p-6 shadow-sm">
+        <h3 class="font-bold text-text-primary mb-4">Kits Cirúrgicos</h3>
+        <div class="flex flex-col gap-3">
+            @foreach($surgery->kits as $kit)
+            <div class="flex items-center justify-between p-4 bg-surface rounded-xl border border-border">
+                <div>
+                    <p class="font-semibold text-text-primary text-sm">{{ $kit->kitTemplate->nome }}</p>
+                    <a href="{{ route('surgery-kits.show', $kit) }}" class="text-xs text-primary hover:underline">Ver detalhes</a>
+                </div>
+                <span
+                    x-data="{ status: '{{ $kit->status }}' }"
+                    x-init="
+                        if (typeof Echo !== 'undefined') {
+                            Echo.private('operations')
+                                .listen('.kit.despachado', (e) => {
+                                    if (e.surgery_kit_id === {{ $kit->id }}) {
+                                        status = 'despachado';
+                                    }
+                                })
+                        }
+                    "
+                    :class="{
+                        'bg-yellow-100 text-warning':  status === 'em_separacao',
+                        'bg-orange-100 text-orange-700': status === 'aguardando_conferencia',
+                        'bg-blue-100 text-primary':    status === 'conferido',
+                        'bg-purple-100 text-purple-700': status === 'despachado',
+                        'bg-green-100 text-success':   status === 'recebido_hospital' || status === 'pronto',
+                        'bg-gray-100 text-gray-600':   status === 'utilizado' || status === 'devolvido',
+                    }"
+                    class="px-2.5 py-0.5 rounded-full text-xs font-medium"
+                    x-text="status.replace(/_/g, ' ')"
+                >
+                    {{ $kit->statusLabel() }}
+                </span>
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @else
+    <div class="bg-surface rounded-2xl border border-border p-5 flex items-center justify-between">
+        <p class="text-sm text-text-secondary">Nenhum kit iniciado para esta cirurgia.</p>
+        <a href="{{ route('surgery-kits.create', $surgery) }}" class="px-4 py-2 bg-primary text-white rounded-xl text-sm font-bold hover:bg-primary/90 transition">
+            Iniciar Kit
+        </a>
+    </div>
+    @endif
 </div>
 @endsection

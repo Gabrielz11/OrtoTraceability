@@ -7,15 +7,18 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 
 /**
  * Queued listener — records material lifecycle events to the event store.
- * Every material domain event (including surgery-material link events)
- * is persisted for chronological lifecycle reconstruction.
+ * Runs on the 'lifecycle' queue, monitored by Horizon.
  */
 class RecordLifecycleEventListener implements ShouldQueue
 {
-    public string $queue = 'default';
+    public string $queue = 'lifecycle';
+
+    private object $event;
 
     public function handle(object $event): void
     {
+        $this->event = $event;
+
         // Only record events that involve a material
         if (!property_exists($event, 'materialId')) {
             return;
@@ -30,6 +33,17 @@ class RecordLifecycleEventListener implements ShouldQueue
             'occurred_at' => $event->occurredAt,
             'payload'     => $this->buildPayload($event),
         ]);
+    }
+
+    public function tags(): array
+    {
+        $tags = ['lifecycle'];
+
+        if (property_exists($this->event ?? new \stdClass, 'materialId')) {
+            $tags[] = 'material:' . ($this->event->materialId ?? 'unknown');
+        }
+
+        return $tags;
     }
 
     private function buildPayload(object $event): array

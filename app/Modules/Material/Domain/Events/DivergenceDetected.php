@@ -4,11 +4,11 @@ namespace App\Modules\Material\Domain\Events;
 
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-use Illuminate\Broadcasting\Channel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Broadcasting\PrivateChannel;
 use App\Modules\Material\Domain\Models\Material;
 
-class DivergenceDetected implements ShouldBroadcastNow
+class DivergenceDetected implements ShouldBroadcast
 {
     use Dispatchable, SerializesModels;
 
@@ -28,30 +28,29 @@ class DivergenceDetected implements ShouldBroadcastNow
 
     public function broadcastOn(): array
     {
-        if (!$this->surgeryId) {
-            return [];
-        }
-
         return [
-            new Channel("surgery.{$this->surgeryId}"),
+            new PrivateChannel('audit'),
+            new PrivateChannel('operations'),
         ];
     }
 
     public function broadcastAs(): string
     {
-        return 'material.divergence_detected';
+        return 'divergence.detected';
     }
 
     public function broadcastWith(): array
     {
-        $material = Material::find($this->materialId);
-        
+        $hasCritical = collect($this->divergences)
+            ->where('severity', 'critical')
+            ->isNotEmpty();
+
         return [
-            'type' => $this->eventType,
-            'material_id' => $this->materialId,
-            'material_name' => $material?->nome ?? 'Material',
-            'divergences' => $this->divergences,
-            'occurred_at' => $this->occurredAt,
+            'material_id'      => $this->materialId,
+            'surgery_id'       => $this->surgeryId,
+            'divergence_count' => count($this->divergences),
+            'has_critical'     => $hasCritical,
+            'occurred_at'      => $this->occurredAt,
         ];
     }
 }

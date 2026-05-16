@@ -60,6 +60,8 @@ class SurgeryController extends Controller
 
         $available_materials = Material::where('status', 'em_estoque')->get();
 
+        $surgery->load(['kits.kitTemplate', 'authorization']);
+
         return view('surgeries.show', compact('surgery', 'audits', 'available_materials'));
     }
 

@@ -2,10 +2,12 @@
 
 namespace App\Modules\Kit\Domain\Events;
 
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class KitDespachado
+class KitDespachado implements ShouldBroadcast
 {
     use Dispatchable, SerializesModels;
 
@@ -20,5 +22,24 @@ class KitDespachado
         public readonly array $metadata = [],
     ) {
         $this->eventType = 'kit.despachado';
+    }
+
+    public function broadcastOn(): array
+    {
+        return [new PrivateChannel('operations')];
+    }
+
+    public function broadcastWith(): array
+    {
+        return [
+            'surgery_kit_id' => $this->surgeryKitId,
+            'surgery_id'     => $this->surgeryId,
+            'occurred_at'    => $this->occurredAt,
+        ];
+    }
+
+    public function broadcastAs(): string
+    {
+        return 'kit.despachado';
     }
 }

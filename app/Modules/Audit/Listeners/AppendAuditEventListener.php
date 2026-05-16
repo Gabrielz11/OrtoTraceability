@@ -5,6 +5,7 @@ namespace App\Modules\Audit\Listeners;
 use App\Modules\Audit\Models\AuditEvent;
 use App\Modules\Material\Domain\Events\DivergenceDetected;
 use App\Modules\Validation\Domain\Models\Divergence;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 /**
@@ -27,6 +28,8 @@ class AppendAuditEventListener
             'after'         => property_exists($event, 'after') ? $event->after : null,
             'metadata'      => $this->buildMetadata($event),
         ]);
+
+        Cache::forget('dashboard.kpis');
 
         if ($event instanceof DivergenceDetected) {
             foreach ($event->divergences as $divergence) {

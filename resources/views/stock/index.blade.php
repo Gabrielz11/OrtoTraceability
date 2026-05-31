@@ -1,126 +1,237 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="flex flex-col gap-8">
+<div class="flex flex-col gap-6">
+
+    {{-- Cabeçalho --}}
     <div class="flex items-center justify-between">
-        <div>
-            <h1 class="text-3xl font-bold text-text-primary">Estoque (Stock Items)</h1>
-            <p class="text-text-secondary mt-1">Itens físicos vinculados ao catálogo de produtos.</p>
-        </div>
-        <a href="{{ route('stock.create') }}" class="px-5 py-2.5 bg-primary text-white rounded-2xl font-semibold shadow-sm hover:shadow-md transition">
-            + Novo Item
+        <h1 class="text-2xl font-bold text-text-primary">Estoque</h1>
+        <a href="{{ route('stock.products.create') }}"
+           class="inline-flex items-center gap-2 bg-primary hover:bg-blue-700
+                  text-white text-sm font-medium px-4 py-2 rounded-xl transition">
+            + Cadastrar Produto
         </a>
     </div>
 
-    <form method="GET" class="bg-surface rounded-2xl border border-border p-5 flex flex-wrap gap-4 items-end">
-        <div class="flex-1 min-w-[160px]">
-            <label class="text-xs font-bold text-text-secondary uppercase">Lote</label>
-            <input type="text" name="lote" value="{{ request('lote') }}" placeholder="Buscar por lote..."
-                class="mt-1 w-full bg-white border border-border rounded-xl px-3 py-2 text-sm outline-none">
+    {{-- Alertas de estoque --}}
+    @if($alerts['vencidos'] > 0 || $alerts['near_expiry'] > 0 || $alerts['sem_estoque'] > 0)
+    <div class="flex flex-wrap gap-3">
+        @if($alerts['vencidos'] > 0)
+        <div class="flex items-center gap-2 bg-red-50 border border-red-200
+                    text-red-700 text-sm px-4 py-2 rounded-lg">
+            🔴 <strong>{{ $alerts['vencidos'] }}</strong> item(ns) vencido(s) em estoque
         </div>
-        <div class="flex-1 min-w-[160px]">
-            <label class="text-xs font-bold text-text-secondary uppercase">Fabricante</label>
-            <select name="fabricante" class="mt-1 w-full bg-white border border-border rounded-xl px-3 py-2 text-sm outline-none">
-                <option value="">Todos</option>
-                @foreach($fabricantes as $fab)
-                <option value="{{ $fab }}" @selected(request('fabricante') === $fab)>{{ $fab }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="flex-1 min-w-[140px]">
-            <label class="text-xs font-bold text-text-secondary uppercase">Tipo</label>
-            <select name="tipo" class="mt-1 w-full bg-white border border-border rounded-xl px-3 py-2 text-sm outline-none">
-                <option value="">Todos</option>
-                <option value="implante_esteril" @selected(request('tipo') === 'implante_esteril')>Implante</option>
-                <option value="instrumental"     @selected(request('tipo') === 'instrumental')>Instrumental</option>
-                <option value="consumivel"       @selected(request('tipo') === 'consumivel')>Consumível</option>
-            </select>
-        </div>
-        <div class="flex-1 min-w-[140px]">
-            <label class="text-xs font-bold text-text-secondary uppercase">Status</label>
-            <select name="status" class="mt-1 w-full bg-white border border-border rounded-xl px-3 py-2 text-sm outline-none">
-                <option value="">Todos</option>
-                <option value="em_estoque"   @selected(request('status') === 'em_estoque')>Em Estoque</option>
-                <option value="reservado"    @selected(request('status') === 'reservado')>Reservado</option>
-                <option value="despachado"   @selected(request('status') === 'despachado')>Despachado</option>
-                <option value="descartado"   @selected(request('status') === 'descartado')>Descartado</option>
-                <option value="devolvido"    @selected(request('status') === 'devolvido')>Devolvido</option>
-            </select>
-        </div>
-        <button type="submit" class="px-4 py-2 bg-primary text-white rounded-xl text-sm font-medium">Filtrar</button>
-        @if(request()->hasAny(['lote','fabricante','tipo','status']))
-        <a href="{{ route('stock.index') }}" class="px-4 py-2 text-sm text-text-secondary hover:text-danger">Limpar</a>
         @endif
-    </form>
-
-    <div class="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
-        <table class="w-full text-sm">
-            <thead class="bg-surface border-b border-border text-text-secondary">
-                <tr>
-                    <th class="px-5 py-4 text-left font-semibold text-[10px] uppercase">Produto</th>
-                    <th class="px-5 py-4 text-left font-semibold text-[10px] uppercase">Lote / Série</th>
-                    <th class="px-5 py-4 text-left font-semibold text-[10px] uppercase">Tamanho</th>
-                    <th class="px-5 py-4 text-left font-semibold text-[10px] uppercase">Validade</th>
-                    <th class="px-5 py-4 text-left font-semibold text-[10px] uppercase">Qtd</th>
-                    <th class="px-5 py-4 text-left font-semibold text-[10px] uppercase">Status</th>
-                    <th class="px-5 py-4 text-right font-semibold text-[10px] uppercase">Ações</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-border">
-                @forelse($stockItems as $item)
-                @php
-                    $statusColors = [
-                        'em_estoque'   => 'bg-green-100 text-success',
-                        'reservado'    => 'bg-yellow-100 text-warning',
-                        'despachado'   => 'bg-purple-100 text-purple-700',
-                        'implantado_usado' => 'bg-gray-100 text-gray-600',
-                        'consumido'    => 'bg-gray-100 text-gray-500',
-                        'descartado'   => 'bg-red-100 text-danger',
-                        'devolvido'    => 'bg-blue-100 text-primary',
-                    ];
-                @endphp
-                <tr class="hover:bg-surface transition {{ $item->isExpired() ? 'bg-red-50/20' : '' }}">
-                    <td class="px-5 py-3">
-                        <p class="font-semibold text-text-primary">{{ $item->productTemplate->nome }}</p>
-                        <p class="text-[10px] text-text-secondary">{{ $item->productTemplate->fabricante }} • {{ $item->productTemplate->codigo }}</p>
-                    </td>
-                    <td class="px-5 py-3">
-                        <p class="text-text-secondary">{{ $item->lote ?? '—' }}</p>
-                        <p class="text-[10px] text-text-secondary">{{ $item->numero_serie ?? '' }}</p>
-                    </td>
-                    <td class="px-5 py-3 text-text-secondary">{{ $item->tamanho ?? '—' }}</td>
-                    <td class="px-5 py-3">
-                        @if($item->validade)
-                        <span class="{{ $item->isExpired() ? 'text-danger font-bold' : ($item->isNearExpiry() ? 'text-warning font-semibold' : 'text-text-primary') }}">
-                            {{ $item->validade->format('d/m/Y') }}
-                        </span>
-                        @else
-                        <span class="text-text-secondary">—</span>
-                        @endif
-                    </td>
-                    <td class="px-5 py-3 text-text-secondary">{{ $item->quantidade }}</td>
-                    <td class="px-5 py-3">
-                        <span class="px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusColors[$item->status] ?? 'bg-surface text-text-secondary' }}">
-                            {{ str_replace('_', ' ', ucfirst($item->status)) }}
-                        </span>
-                    </td>
-                    <td class="px-5 py-3 text-right">
-                        <a href="{{ route('stock.show', $item) }}" class="text-primary text-xs font-bold hover:underline mr-2">Ver</a>
-                        @if($item->status === 'em_estoque')
-                        <a href="{{ route('stock.edit', $item) }}" class="text-text-secondary text-xs hover:underline mr-2">Editar</a>
-                        @endif
-                    </td>
-                </tr>
-                @empty
-                <tr><td colspan="7" class="px-5 py-12 text-center text-text-secondary italic">Nenhum item encontrado.</td></tr>
-                @endforelse
-            </tbody>
-        </table>
-        @if($stockItems->hasPages())
-        <div class="px-5 py-4 border-t border-border bg-surface">
-            {{ $stockItems->links() }}
+        @if($alerts['near_expiry'] > 0)
+        <div class="flex items-center gap-2 bg-yellow-50 border border-yellow-200
+                    text-yellow-700 text-sm px-4 py-2 rounded-lg">
+            ⚠️ <strong>{{ $alerts['near_expiry'] }}</strong> item(ns) vencendo em 30 dias
+        </div>
+        @endif
+        @if($alerts['sem_estoque'] > 0)
+        <div class="flex items-center gap-2 bg-gray-50 border border-gray-200
+                    text-gray-600 text-sm px-4 py-2 rounded-lg">
+            📦 <strong>{{ $alerts['sem_estoque'] }}</strong> produto(s) sem estoque
         </div>
         @endif
     </div>
+    @endif
+
+    {{-- Filtros --}}
+    <form method="GET" action="{{ route('stock.index') }}"
+          class="flex flex-wrap gap-3 items-end">
+        <div class="flex-1 min-w-48">
+            <input type="text" name="search" value="{{ request('search') }}"
+                   placeholder="Buscar por nome, fabricante ou código..."
+                   class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm
+                          focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+            <select name="tipo"
+                    class="border border-gray-300 rounded-lg px-3 py-2 text-sm
+                           focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Todos os tipos</option>
+                @foreach($tipos as $value => $label)
+                <option value="{{ $value }}" @selected(request('tipo') === $value)>
+                    {{ $label }}
+                </option>
+                @endforeach
+            </select>
+        </div>
+        <div>
+            <select name="categoria"
+                    class="border border-gray-300 rounded-lg px-3 py-2 text-sm
+                           focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Todas as categorias</option>
+                @foreach($categorias as $value => $label)
+                <option value="{{ $value }}" @selected(request('categoria') === $value)>
+                    {{ $label }}
+                </option>
+                @endforeach
+            </select>
+        </div>
+        <button type="submit"
+                class="bg-gray-100 hover:bg-gray-200 text-gray-700
+                       text-sm px-4 py-2 rounded-lg transition">
+            Filtrar
+        </button>
+        @if(request()->hasAny(['search', 'tipo', 'categoria']))
+        <a href="{{ route('stock.index') }}"
+           class="text-sm text-gray-500 hover:text-gray-700 py-2">
+            Limpar
+        </a>
+        @endif
+    </form>
+
+    {{-- Flash message --}}
+    @if(session('success'))
+    <div class="bg-green-50 border border-green-200 text-green-700
+                text-sm px-4 py-3 rounded-lg">
+        {{ session('success') }}
+    </div>
+    @endif
+
+    {{-- Lista de produtos --}}
+    <div class="space-y-2">
+        @forelse($products as $product)
+        <div x-data="{ open: false }"
+             class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition">
+
+            {{-- Cabeçalho do produto --}}
+            <div class="flex items-center gap-4 p-4 cursor-pointer"
+                 @click="open = !open">
+
+                {{-- Ícone expansão --}}
+                <span class="text-gray-400 text-xs w-4 shrink-0"
+                      x-text="open ? '▼' : '▶'"></span>
+
+                {{-- Info principal --}}
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="font-medium text-gray-900 text-sm">
+                            {{ $product->nome }}
+                        </span>
+                        <span class="text-xs text-gray-400">{{ $product->fabricante }}</span>
+                    </div>
+                    <div class="flex items-center gap-2 mt-0.5 flex-wrap">
+                        <span class="text-xs px-2 py-0.5 rounded-full font-medium
+                            {{ $product->tipo === 'implante_esteril' ? 'bg-blue-100 text-blue-700' : '' }}
+                            {{ $product->tipo === 'instrumental' ? 'bg-purple-100 text-purple-700' : '' }}
+                            {{ $product->tipo === 'consumivel' ? 'bg-teal-100 text-teal-700' : '' }}">
+                            {{ $product->tipoLabel() }}
+                        </span>
+                        <span class="text-xs text-gray-400">{{ $product->categoriaLabel() }}</span>
+                        @if($product->codigo_anvisa)
+                        <span class="text-xs text-gray-300">ANVISA: {{ $product->codigo_anvisa }}</span>
+                        @endif
+                    </div>
+                </div>
+
+                {{-- Quantidade e alertas --}}
+                <div class="flex items-center gap-3 shrink-0">
+                    @if($product->hasExpiredItems())
+                    <span class="text-xs text-red-600 font-medium">🔴 vencido</span>
+                    @elseif($product->hasNearExpiryItems())
+                    <span class="text-xs text-yellow-600 font-medium">⚠️ a vencer</span>
+                    @endif
+
+                    @if($product->total_em_estoque === 0)
+                    <span class="text-xs bg-red-50 border border-red-200
+                                 text-red-600 px-2.5 py-1 rounded-full font-medium">
+                        sem estoque
+                    </span>
+                    @else
+                    <span class="text-xs bg-green-50 border border-green-200
+                                 text-green-700 px-2.5 py-1 rounded-full font-medium">
+                        {{ $product->total_em_estoque }} em estoque
+                    </span>
+                    @endif
+
+                    {{-- Ações --}}
+                    <div class="flex items-center gap-1" @click.stop>
+                        <a href="{{ route('stock.items.create', $product) }}"
+                           class="text-xs bg-primary hover:bg-blue-700 text-white
+                                  px-3 py-1.5 rounded-lg transition font-medium">
+                            + Entrada
+                        </a>
+                        <a href="{{ route('stock.products.edit', $product) }}"
+                           class="text-xs text-gray-500 hover:text-gray-700
+                                  px-2 py-1.5 rounded-lg hover:bg-gray-100 transition">
+                            Editar
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Itens de estoque (expansível) --}}
+            <div x-show="open"
+                 x-transition:enter="transition ease-out duration-150"
+                 x-transition:enter-start="opacity-0 -translate-y-1"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 class="border-t border-gray-100">
+
+                @forelse($product->stockItemsInStock as $item)
+                <div class="flex items-center gap-4 px-6 py-2.5 text-sm
+                            {{ $loop->even ? 'bg-gray-50' : 'bg-white' }}
+                            {{ $item->isExpired() ? '!bg-red-50' : '' }}
+                            {{ $item->isNearExpiry() && !$item->isExpired() ? '!bg-yellow-50' : '' }}">
+
+                    {{-- Lote --}}
+                    <span class="font-mono text-xs text-gray-500 w-32 shrink-0">
+                        {{ $item->lote ? 'Lote ' . $item->lote : '—' }}
+                    </span>
+
+                    {{-- Série --}}
+                    @if($item->numero_serie)
+                    <span class="text-xs text-gray-400 w-32 shrink-0 truncate">
+                        Série {{ $item->numero_serie }}
+                    </span>
+                    @endif
+
+                    {{-- Tamanho --}}
+                    @if($item->tamanho)
+                    <span class="text-xs text-gray-500">{{ $item->tamanho }}</span>
+                    @endif
+
+                    {{-- Quantidade (para consumíveis) --}}
+                    @if($item->quantidade > 1)
+                    <span class="text-xs text-gray-500">Qtd: {{ $item->quantidade }}</span>
+                    @endif
+
+                    {{-- Validade --}}
+                    @if($item->validade)
+                    <span class="text-xs px-2 py-0.5 rounded-full {{ $item->expiryBadgeClass() }}">
+                        {{ $item->expiryLabel() }}
+                    </span>
+                    @endif
+
+                    {{-- Status --}}
+                    <span class="ml-auto text-xs px-2 py-0.5 rounded-full {{ $item->statusBadgeClass() }}">
+                        {{ str_replace('_', ' ', $item->status) }}
+                    </span>
+                </div>
+                @empty
+                <div class="px-6 py-4 text-sm text-gray-400 italic">
+                    Nenhum item em estoque no momento.
+                </div>
+                @endforelse
+            </div>
+        </div>
+        @empty
+        <div class="bg-white border border-gray-200 rounded-xl p-12 text-center">
+            <p class="text-gray-400 text-sm">Nenhum produto encontrado.</p>
+            <a href="{{ route('stock.products.create') }}"
+               class="inline-block mt-3 text-sm text-blue-600 hover:underline">
+                Cadastrar primeiro produto →
+            </a>
+        </div>
+        @endforelse
+    </div>
+
+    {{-- Paginação --}}
+    <div>
+        {{ $products->links() }}
+    </div>
+
 </div>
 @endsection

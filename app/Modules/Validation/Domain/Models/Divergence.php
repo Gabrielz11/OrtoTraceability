@@ -44,6 +44,18 @@ class Divergence extends Model
         return $this->belongsTo(User::class, 'acknowledged_by');
     }
 
+    // Scopes
+    public function scopeOpen($query)
+    {
+        return $query->where('status', 'open');
+    }
+
+    public function scopeCritical($query)
+    {
+        return $query->where('severity', 'critical');
+    }
+
+    // Helpers
     public function isCritical(): bool
     {
         return $this->severity === 'critical';
@@ -52,5 +64,15 @@ class Divergence extends Model
     public function isOpen(): bool
     {
         return $this->status === 'open';
+    }
+
+    public function severityColor(): string
+    {
+        return match ($this->severity) {
+            'critical' => 'red',
+            'high'     => 'orange',
+            'warning'  => 'amber',
+            default    => 'gray',
+        };
     }
 }

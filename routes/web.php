@@ -34,9 +34,17 @@ Route::middleware(['auth', 'role:admin,instrumentator'])->group(function () {
     Route::post('surgeries/{surgery}/use/{material}', [SurgeryController::class, 'markAsUsed'])->name('surgeries.use');
     Route::get('surgeries/{surgery}/display-url', [DisplayController::class, 'generateUrl'])->name('surgeries.display_url');
 
-    // ── Stock (novo módulo) ──────────────────────────────────────
-    Route::resource('stock', StockController::class);
-    Route::post('stock/{stock}/discard', [StockController::class, 'discard'])->name('stock.discard');
+    // ── Stock ────────────────────────────────────────────────────
+    Route::get('stock', [StockController::class, 'index'])->name('stock.index');
+
+    Route::get('stock/products/create', [StockController::class, 'createProduct'])->name('stock.products.create');
+    Route::post('stock/products', [StockController::class, 'storeProduct'])->name('stock.products.store');
+    Route::get('stock/products/{product}', [StockController::class, 'showProduct'])->name('stock.products.show');
+    Route::get('stock/products/{product}/edit', [StockController::class, 'editProduct'])->name('stock.products.edit');
+    Route::put('stock/products/{product}', [StockController::class, 'updateProduct'])->name('stock.products.update');
+
+    Route::get('stock/products/{product}/items/create', [StockController::class, 'createItem'])->name('stock.items.create');
+    Route::post('stock/products/{product}/items', [StockController::class, 'storeItem'])->name('stock.items.store');
 
     // ── Kit Templates ────────────────────────────────────────────
     Route::resource('kit-templates', KitTemplateController::class);

@@ -9,7 +9,7 @@
 
 **OrtoTraceability** is an open-source, backend-first traceability and operational control system for implantable medical devices (OPME — Orthotics, Prosthetics, and Special Materials) within surgical supply chain environments. Built on Laravel 12 with an event-driven audit architecture, it provides end-to-end visibility into the lifecycle of surgical implants — from distributor receipt through intraoperative use, post-procedural reconciliation, and insurance claim validation.
 
-This project is a functional MVP designed to demonstrate architectural principles for healthcare operational systems operating in high-reliability, compliance-driven environments. It reflects the author's deep professional experience in the design and implementation of proprietary healthcare ERP systems for real surgical environments.
+This independent project builds upon professional experience in healthcare operational process design, inventory information management, surgical scheduling workflows, and material traceability controls.
 
 > [!IMPORTANT]
 > **Professional Disclaimer:** This is an original, independent technical work and does **not** replicate, expose, or reproduce any proprietary code, intellectual property, trade secrets, confidential data, or business information from any current or former employer. The system is built from scratch as a public demonstration of architectural methodology and technical expertise in healthcare systems engineering. All data used in seeds and examples is synthetic.
